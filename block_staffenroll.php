@@ -83,7 +83,7 @@ class block_staffenroll extends block_list {
         $this->content->items[] = html_writer::tag('a', 'infoshop',
             array('href' => 'https://www.infoshop.org'));
         $this->content->icons[] = html_writer::empty_tag('img',
-            array('src' => 'pix/item.png', 'class' => 'icon'));
+            array('src' => '/blocks/staffenroll/pix/item.png', 'class' => 'icon'));
 
         return $this->content;
     }
