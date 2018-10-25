@@ -65,6 +65,11 @@ class block_staffenroll extends block_list {
             $this->content->footer = 'Footer content of staffenroll block.';
         }
 
+        $arbitrary = get_config('block_staffenroll', 'arbitrary');
+        $this->content->items[] = html_writer::tag('a', $arbitrary,
+            array('href' => 'file:///tmp'));
+        $this->content->icons[] = html_writer::empty_tag('img',
+            array('src' => '/blocks/staffenroll/pix/item.png', 'class' => 'icon'));
         $this->content->items[] = html_writer::tag('a', 'infoshop',
             array('href' => 'https://www.infoshop.org'));
         $this->content->icons[] = html_writer::empty_tag('img',

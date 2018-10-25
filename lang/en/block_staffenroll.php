@@ -10,13 +10,14 @@ $string['blocksettings'] = 'Staff Enroll settings';
 $string['blockheader'] = 'block header';
 // $string['blockstring'] = 'block string';
 $string['blockfooter'] = 'block footer';
-$string['headerconfig'] = 'Configure header';
-$string['descconfig'] = 'Show or hide header';
+$string['headerconfig'] = 'Configure Staff Enroll';
+$string['descconfig'] = 'To set global options';
 $string['dogs'] = 'Dogs';
 $string['tumbleweeds'] = 'Tumbleweeds';
 $string['satellites'] = 'Satellites';
-$string['staffenrollarbitrarydefault'] = 'Arbitrary setting';
-$string['configstaffenrollarbitrarydefault'] = 'Set an arbitrary configuration setting';
+$string['staffenrollarbitrarydefault'] = 'Arbitrary link target';
+$string['configstaffenrollarbitrarydefault'] = 'Set text for file:///tmp link';
+
 // FIXME: renamed (adjust within)
 //$string['all_courses_link_text'] = 'All Courses';
 $string['allcoursestext'] = 'All Courses';
