@@ -7,14 +7,15 @@ class block_staffenroll extends block_list {
     // called after init() and before anything else
     public function specialization() {
         if (isset($this->config)) {
-            if (empty($this->config->title)) {
-                $this->title = get_string('defaulttitle', 'block_staffenroll');
-            } else {
+            if (! empty($this->config->title)) {
                 $this->title = $this->config->title;
             }
 
-            if (empty($this->config->footer)) {
-                $this->config->footer = get_string('defaultfooter', 'block_staffenroll');
+            if (! empty($this->config->footer)) {
+                $this->footer = $this->config->footer;
+            }
+            else {
+                $this->footer = get_string('defaultfooter', 'block_staffenroll');
             }
         }
     }
@@ -79,7 +80,12 @@ class block_staffenroll extends block_list {
         $this->content = new stdClass;
         $this->content->items = array();
         $this->content->icons = array();
-        $this->content->footer = 'Footer content of staffenroll block.';
+        if( $this->footer) {
+            $this->content->footer = $this->footer;
+        }
+        else {
+            $this->content->footer = 'Footer content of staffenroll block.';
+        }
 
         $this->content->items[] = html_writer::tag('a', 'infoshop',
             array('href' => 'https://www.infoshop.org'));

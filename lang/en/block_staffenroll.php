@@ -7,6 +7,7 @@ $string['defaulttitle'] = 'Default Title';
 // $string['defaultstring'] = 'default string';
 $string['defaultfooter'] = 'default footer';
 $string['blocksettings'] = 'Staff Enroll settings';
+$string['blockheader'] = 'block header';
 // $string['blockstring'] = 'block string';
 $string['blockfooter'] = 'block footer';
 $string['headerconfig'] = 'Configure header';
