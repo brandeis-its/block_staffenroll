@@ -13,8 +13,8 @@ class block_staffenroll extends block_list {
                 $this->title = $this->config->title;
             }
 
-            if (empty($this->config->text)) {
-                $this->config->text = get_string('defaulttext', 'block_staffenroll');
+            if (empty($this->config->footer)) {
+                $this->config->footer = get_string('defaultfooter', 'block_staffenroll');
             }
         }
     }
@@ -26,6 +26,7 @@ class block_staffenroll extends block_list {
         return true;
     }
 
+    /*
     // to strip tags when saving
     // FIXME: this is prolly not needed
     // and perhaps should be in get_content()
@@ -40,15 +41,15 @@ class block_staffenroll extends block_list {
         // And now forward to the default implementation defined in the parent class
         return parent::instance_config_save($data,$nolongerused);
     }
+     */
 
-
-/*
+    /*
     // header can only be hidden this way
     // FIXME: may want to show the header
     public function hide_header() {
         return true;
     }
- */
+     */
 
     // This results in the block having all its normal HTML attributes, as
     // inherited from the base block class, plus our additional class name.

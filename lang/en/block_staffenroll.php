@@ -1,13 +1,14 @@
 <?php
-$string['pluginname'] = 'Staff enrollments';
-// FIXME: is this needed?
+// $string['pluginname'] = 'Staff enrollments';
 $string['staffenroll'] = 'Staff Enroll';
-$string['staffenroll:addinstance'] = 'Add a new staff enrollments block';
-$string['staffenroll:myaddinstance'] = 'Add a new staff enrollments block to the My Moodle page';
-$string['defaulttitle'] = 'Title';
-$string['defaultstring'] = 'default string';
+// $string['staffenroll:addinstance'] = 'Add a new staff enrollments block';
+// $string['staffenroll:myaddinstance'] = 'Add a new staff enrollments block to the My Moodle page';
+$string['defaulttitle'] = 'Default Title';
+// $string['defaultstring'] = 'default string';
+$string['defaultfooter'] = 'default footer';
 $string['blocksettings'] = 'Staff Enroll settings';
-$string['blockstring'] = 'block string';
+// $string['blockstring'] = 'block string';
+$string['blockfooter'] = 'block footer';
 $string['headerconfig'] = 'Configure header';
 $string['descconfig'] = 'Show or hide header';
 $string['dogs'] = 'Dogs';
