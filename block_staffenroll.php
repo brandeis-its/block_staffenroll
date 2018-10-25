@@ -2,7 +2,9 @@
 class block_staffenroll extends block_list {
     public function init() {
         $this->title = get_string('staffenroll', 'block_staffenroll');
+        $this->footer = get_string('defaultfooter', 'block_staffenroll');
     }
+
 
     // called after init() and before anything else
     public function specialization() {
@@ -14,11 +16,9 @@ class block_staffenroll extends block_list {
             if (! empty($this->config->footer)) {
                 $this->footer = $this->config->footer;
             }
-            else {
-                $this->footer = get_string('defaultfooter', 'block_staffenroll');
-            }
         }
     }
+
 
     // FIXME: this may not be necessary
     // allows for global config variables
@@ -27,30 +27,6 @@ class block_staffenroll extends block_list {
         return true;
     }
 
-    /*
-    // to strip tags when saving
-    // FIXME: this is prolly not needed
-    // and perhaps should be in get_content()
-    // saving it because it's part of learning
-    public function instance_config_save($data, $nolongerused=false) {
-        // i think this has the logic wrong
-        //if(get_config('block_staffenroll', 'Allow_HTML') == '1') {
-        if(get_config('block_staffenroll', 'Allow_HTML') == '0') {
-            $data->text = strip_tags($data->text);
-        }
-
-        // And now forward to the default implementation defined in the parent class
-        return parent::instance_config_save($data,$nolongerused);
-    }
-     */
-
-    /*
-    // header can only be hidden this way
-    // FIXME: may want to show the header
-    public function hide_header() {
-        return true;
-    }
-     */
 
     // This results in the block having all its normal HTML attributes, as
     // inherited from the base block class, plus our additional class name.
@@ -60,6 +36,7 @@ class block_staffenroll extends block_list {
         $attributes['class'] .= ' block_'. $this->name(); // Append our class to class attribute
         return $attributes;
     }
+
 
     // specifies which pages are legal to display block
     // in this case, front page and course view pages
@@ -72,6 +49,7 @@ class block_staffenroll extends block_list {
         );
     }
 
+
     function get_content() {
         if ($this->content !== NULL) {
             return $this->content;
@@ -80,7 +58,7 @@ class block_staffenroll extends block_list {
         $this->content = new stdClass;
         $this->content->items = array();
         $this->content->icons = array();
-        if( $this->footer) {
+        if($this->footer) {
             $this->content->footer = $this->footer;
         }
         else {
