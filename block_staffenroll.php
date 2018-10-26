@@ -57,12 +57,12 @@ class block_staffenroll extends block_list {
         $this->content->icons = array();
 
         $footerURL = new moodle_url(
-            '/blocks/supportenroll/view.php',
+            '/blocks/staffenroll/view.php',
             array('blockid' => $this->instance->id, 'courseid' => $COURSE->id)
         );
         $this->content->footer = html_writer::link(
             $footerURL,
-            get_string('addpage', 'block_supportenroll')
+            get_string('addpage', 'block_staffenroll')
         );
 
         $arbIdx = get_config('block_staffenroll', 'arbitrary');
