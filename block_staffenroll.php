@@ -2,7 +2,6 @@
 class block_staffenroll extends block_list {
     public function init() {
         $this->title = get_string('staffenroll', 'block_staffenroll');
-        $this->footer = get_string('defaultfooter', 'block_staffenroll');
     }
 
 
@@ -11,10 +10,6 @@ class block_staffenroll extends block_list {
         if (isset($this->config)) {
             if (! empty($this->config->title)) {
                 $this->title = $this->config->title;
-            }
-
-            if (! empty($this->config->footer)) {
-                $this->footer = $this->config->footer;
             }
         }
     }
@@ -51,6 +46,8 @@ class block_staffenroll extends block_list {
 
 
     function get_content() {
+        global $COURSE;
+
         if ($this->content !== NULL) {
             return $this->content;
         }
@@ -58,12 +55,15 @@ class block_staffenroll extends block_list {
         $this->content = new stdClass;
         $this->content->items = array();
         $this->content->icons = array();
-        if($this->footer) {
-            $this->content->footer = $this->footer;
-        }
-        else {
-            $this->content->footer = 'Footer content of staffenroll block.';
-        }
+
+        $footerURL = new moodle_url(
+            '/blocks/supportenroll/view.php',
+            array('blockid' => $this->instance->id, 'courseid' => $COURSE->id)
+        );
+        $this->content->footer = html_writer::link(
+            $footerURL,
+            get_string('addpage', 'block_supportenroll')
+        );
 
         $arbIdx = get_config('block_staffenroll', 'arbitrary');
         // FIXME: should be global
@@ -77,11 +77,11 @@ class block_staffenroll extends block_list {
         $arbitrary = $arbOptions[$arbIdx];
 
         $this->content->items[] = html_writer::tag('a', $arbitrary,
-            array('href' => 'file:///tmp'));
+            array('href' => 'https://random.org', 'target' => '_blank'));
         $this->content->icons[] = html_writer::empty_tag('img',
             array('src' => '/blocks/staffenroll/pix/item.png', 'class' => 'icon'));
-        $this->content->items[] = html_writer::tag('a', 'infoshop',
-            array('href' => 'https://www.infoshop.org'));
+        $this->content->items[] = html_writer::tag('a', 'lorem ipsum',
+            array('href' => 'https://lipsum.com', 'target' => '_blank'));
         $this->content->icons[] = html_writer::empty_tag('img',
             array('src' => '/blocks/staffenroll/pix/item.png', 'class' => 'icon'));
 

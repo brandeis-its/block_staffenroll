@@ -10,9 +10,5 @@ class block_staffenroll_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_title', get_string('blocktitle', 'block_staffenroll'));
         $mform->setDefault('config_title', 'default config title');
         $mform->setType('config_title', PARAM_TEXT);
-
-        $mform->addElement('text', 'config_footer', get_string('blockfooter', 'block_staffenroll'));
-        $mform->setDefault('config_footer', 'default config footer');
-        $mform->setType('config_footer', PARAM_RAW);
     }
 }
