@@ -1,3 +1,4 @@
+<?php
 require_once("{$CFG->libdir}/formslib.php");
 
 class staffenroll_form extends moodleform {
