@@ -8,7 +8,9 @@ $settings->add(new admin_setting_heading(
     get_string('descconfig', 'block_staffenroll')
 ));
 
-$arbitraryOptions = array(
+// FIXME: should be global
+// this needs to match what's written in block_staffenroll.php
+$arbOptions = array(
     0 => get_string('none'),
     1 => get_string('dogs', 'block_staffenroll'),
     2 => get_string('tumbleweeds', 'block_staffenroll'),
@@ -20,5 +22,5 @@ $settings->add(new admin_setting_configselect(
     get_string('staffenrollarbitrarydefault', 'block_staffenroll'),
     get_string('configstaffenrollarbitrarydefault', 'block_staffenroll'),
     0,
-    $arbitraryOptions)
+    $arbOptions)
 );

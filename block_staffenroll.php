@@ -65,7 +65,17 @@ class block_staffenroll extends block_list {
             $this->content->footer = 'Footer content of staffenroll block.';
         }
 
-        $arbitrary = get_config('block_staffenroll', 'arbitrary');
+        $arbIdx = get_config('block_staffenroll', 'arbitrary');
+        // FIXME: should be global
+        // this needs to match what's written in settings.php
+        $arbOptions = array(
+            '',
+            'dogs',
+            'tumbleweeds',
+            'satellites'
+        );
+        $arbitrary = $arbOptions[$arbIdx];
+
         $this->content->items[] = html_writer::tag('a', $arbitrary,
             array('href' => 'file:///tmp'));
         $this->content->icons[] = html_writer::empty_tag('img',
