@@ -1,6 +1,6 @@
 <?php
 require_once("{$CFG->libdir}/formslib.php");
-require_once($CFG->dirroot.'/blocks/simplehtml/lib.php');
+require_once($CFG->dirroot.'/blocks/staffenroll/lib.php');
 
 class staffenroll_form extends moodleform {
 
@@ -41,7 +41,7 @@ class staffenroll_form extends moodleform {
         $mform->setDefault('displaypicture', 1);
 
         // add image selector radio buttons
-        $images = block_simplehtml_images();
+        $images = block_staffenroll_images();
         $radioarray = array();
         for ($i = 0; $i < count($images); $i++) {
             $radioarray[] =& $mform->createElement('radio', 'picture', '', $images[$i], $i);
@@ -64,7 +64,7 @@ class staffenroll_form extends moodleform {
 
         // add date_time selector in optional area
         $mform->addElement('date_time_selector', 'displaydate',
-            get_string('displaydate', 'block_simplehtml'), array('optional' => true)
+            get_string('displaydate', 'block_staffenroll'), array('optional' => true)
         );
         $mform->setAdvanced('optional');
 
