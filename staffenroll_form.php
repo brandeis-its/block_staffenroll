@@ -18,7 +18,7 @@ class staffenroll_form extends moodleform {
         $mform->addRule('pagetitle', null, 'required', null, 'client');
 
         // add display text field
-        $mform->addElement('htmleditor', 'displaytext',
+        $mform->addElement('editor', 'displaytext',
             get_string('displayedhtml', 'block_staffenroll')
         );
         $mform->setType('displaytext', PARAM_RAW);
