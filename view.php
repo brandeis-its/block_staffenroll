@@ -43,7 +43,7 @@ if($staffenroll->is_cancelled()) {
     // Cancelled forms redirect to the course main page.
     $courseurl = new moodle_url('/course/view.php', array('id' => $id));
     redirect($courseurl);
-} else if ($fromfrom = $staffenroll->get_data()) {
+} else if ($fromform = $staffenroll->get_data()) {
     // We need to add code to appropriately act on and store the submitted data
     // but now we just print it out for debugging
     print_object($fromform);
