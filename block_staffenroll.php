@@ -79,7 +79,7 @@ class block_staffenroll extends block_list {
         $this->content->items[] = html_writer::tag('a', $arbitrary,
             array('href' => 'https://random.org', 'target' => '_blank'));
         $this->content->icons[] = html_writer::empty_tag('img',
-            array('src' => '/blocks/staffenroll/pix/item.png', 'class' => 'icon'));
+            array('src' => 'pix/item.png', 'class' => 'icon'));
         $this->content->items[] = html_writer::tag('a', 'lorem ipsum',
             array('href' => 'https://lipsum.com', 'target' => '_blank'));
         $this->content->icons[] = html_writer::empty_tag('img',

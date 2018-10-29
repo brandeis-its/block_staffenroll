@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/staffenroll/db" VERSION="20120122" COMMENT="XMLDB file for Moodle blocks/staffenroll"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_staffenroll" COMMENT="Staffenroll block">
+      <FIELDS>
+        <FIELD NAME="blockid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="pagetitle" TYPE="char" LENGTH="25" NOTNULL="true"/>
+        <FIELD NAME="displaytext" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="format" TYPE="int" LENGTH="3" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="filename" TYPE="char" LENGTH="255" NOTNULL="true"/>
+        <FIELD NAME="picture" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="true"/>
+        <FIELD NAME="displaypicture" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+        <FIELD NAME="displaydate" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" DEFAULT="0"/>
+      </FIELDS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
