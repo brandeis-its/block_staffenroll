@@ -26,6 +26,11 @@ $string['displaypicture'] = 'default displaypicture value';
 $string['red'] = 'default red value';
 $string['blue'] = 'default blue value';
 $string['green'] = 'default green value';
+$string['displaypicture'] = 'default displaypicture value';
+$string['pictureselect'] = 'default pictureselect value';
+$string['picturedesc'] = 'default picturedesc value';
+$string['optional'] = 'default optional value';
+$string['displaydate'] = 'default displaydate value';
 
 // FIXME: renamed (adjust within)
 //$string['all_courses_link_text'] = 'All Courses';
