@@ -44,7 +44,7 @@ if($staffenroll->is_cancelled()) {
     $courseurl = new moodle_url('/course/view.php', array('id' => $id));
     redirect($courseurl);
 } else if ($fromform = $staffenroll->get_data()) {
-    if (!$DB->insert_record('block_simplehtml', $fromform)) {
+    if (!$DB->insert_record('block_staffenroll', $fromform)) {
         print_error('inserterror', 'block_staffenroll');
     }
     else {
