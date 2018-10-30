@@ -4,3 +4,7 @@
     font-size: .8em;
     text-align: center;
 }
+
+ul.staffenroll {
+    list-style-image: url('/blocks/staffenroll/pix/item.png');
+}

@@ -15,9 +15,7 @@ class block_staffenroll extends block_base {
     }
 
 
-    // FIXME: this may not be necessary
     // allows for global config variables
-    // across all instances
     function has_config() {
         return true;
     }
@@ -70,12 +68,8 @@ class block_staffenroll extends block_base {
 
         // NOTE: this is tutorial code rewritten
         $textContent[] = html_writer::start_tag('ul',
-            // FIXME: this should be in stylesheet and not inline style
-            // in tutorial code, moodle uses empty_tab with src attribute
-            // may or may not need URL all the way from '/'
-            array('style' => "list-style-image: url('pix/item.png');")
+            array('class' => 'staffenroll')
         );
-
         $textContent[] = html_writer::start_tag('li');
         $arbIdx = get_config('block_staffenroll', 'arbitrary');
         // FIXME: should be global
@@ -129,9 +123,6 @@ class block_staffenroll extends block_base {
 }
 
 /*
-    // FIXME: is empty footer necessary?
-    $this->content->footer = '';
-
     // get information about support staff roles, and which permission is
     // required to enroll in each role
     $roles = support_staff_enrollments_get_support_roles();

@@ -1,5 +1,5 @@
 <?php
-// $string['pluginname'] = 'Staff enrollments';
+$string['pluginname'] = 'Staff enrollments';
 $string['staffenroll'] = 'Staff Enroll';
 // $string['staffenroll:addinstance'] = 'Add a new staff enrollments block';
 // $string['staffenroll:myaddinstance'] = 'Add a new staff enrollments block to the My Moodle page';
