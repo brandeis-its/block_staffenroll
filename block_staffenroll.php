@@ -1,5 +1,5 @@
 <?php
-class block_staffenroll extends block_list {
+class block_staffenroll extends block_base {
     public function init() {
         $this->title = get_string('staffenroll', 'block_staffenroll');
     }
@@ -46,15 +46,18 @@ class block_staffenroll extends block_list {
 
 
     function get_content() {
-        global $COURSE;
+        global $COURSE, $DB;
 
         if ($this->content !== NULL) {
             return $this->content;
         }
 
+        if (!empty($this->config->text)) {
+            $this->content->text = $this->config->text;
+        }
+
         $this->content = new stdClass;
-        $this->content->items = array();
-        $this->content->icons = array();
+        $textContent = array();
 
         $footerURL = new moodle_url(
             '/blocks/staffenroll/view.php',
@@ -65,6 +68,15 @@ class block_staffenroll extends block_list {
             get_string('addpage', 'block_staffenroll')
         );
 
+        // NOTE: this is tutorial code rewritten
+        $textContent[] = html_writer::start_tag('ul',
+            // FIXME: this should be in stylesheet and not inline style
+            // in tutorial code, moodle uses empty_tab with src attribute
+            // may or may not need URL all the way from '/'
+            array('style' => "list-style-image: url('pix/item.png');")
+        );
+
+        $textContent[] = html_writer::start_tag('li');
         $arbIdx = get_config('block_staffenroll', 'arbitrary');
         // FIXME: should be global
         // this needs to match what's written in settings.php
@@ -75,16 +87,43 @@ class block_staffenroll extends block_list {
             'satellites'
         );
         $arbitrary = $arbOptions[$arbIdx];
+        $textContent[] = html_writer::tag('a', $arbitrary,
+            array('href' => 'https://random.org', 'target' => '_blank')
+        );
+        $textContent[] = html_writer::end_tag('li');
 
-        $this->content->items[] = html_writer::tag('a', $arbitrary,
-            array('href' => 'https://random.org', 'target' => '_blank'));
-        $this->content->icons[] = html_writer::empty_tag('img',
-            array('src' => 'pix/item.png', 'class' => 'icon'));
-        $this->content->items[] = html_writer::tag('a', 'lorem ipsum',
-            array('href' => 'https://lipsum.com', 'target' => '_blank'));
-        $this->content->icons[] = html_writer::empty_tag('img',
-            array('src' => '/blocks/staffenroll/pix/item.png', 'class' => 'icon'));
+        $textContent[] = html_writer::start_tag('li');
+        $textContent[] = html_writer::tag('a', 'lorem ipsum',
+            array('href' => 'https://lipsum.com', 'target' => '_blank')
+        );
+        $textContent[] = html_writer::end_tag('li');
 
+        $textContent[] = html_writer::end_tag('ul');
+
+        // This is the new code.
+        $staffenrollpages = $DB->get_records('block_staffenroll',
+            array('blockid' => $this->instance->id)
+        );
+        if ($staffenrollpages) {
+            $textContent[] = html_writer::start_tag('ul');
+            foreach ($staffenrollpages as $sep) {
+                $pageurl = new moodle_url(
+                    '/blocks/staffenroll/view.php',
+                    array(
+                        'blockid' => $this->instance->id,
+                        'courseid' => $COURSE->id,
+                        'id' => $sep->id,
+                        'viewpage' => '1'
+                    )
+                );
+                $textContent[] = html_writer::start_tag('li');
+                $textContent[] = html_writer::link($pageurl, $sep->pagetitle);
+                $textContent[] = html_writer::end_tag('li');
+            }
+            $textContent[] = html_writer::end_tag('ul');
+        }
+
+        $this->content->text = implode("\n", $textContent);
         return $this->content;
     }
 }
@@ -120,3 +159,4 @@ class block_staffenroll extends block_list {
         $this->content->items[] = html_writer::link( $url, $link_text );
     }
  */
+
