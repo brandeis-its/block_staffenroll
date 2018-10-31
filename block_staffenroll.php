@@ -101,12 +101,18 @@ class block_staffenroll extends block_base {
         if ($staffenrollpages) {
             $textContent[] = html_writer::start_tag('ul');
             foreach ($staffenrollpages as $sep) {
+
+                // FIXME: is this param even needed?
+                $id = $COURSE->id;
+                if(isset($sep->id)) {
+                    $id = $sep->id;
+                }
                 $pageurl = new moodle_url(
                     '/blocks/staffenroll/view.php',
                     array(
                         'blockid' => $this->instance->id,
                         'courseid' => $COURSE->id,
-                        'id' => $sep->id,
+                        'id' => $id,
                         'viewpage' => '1'
                     )
                 );

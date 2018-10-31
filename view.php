@@ -44,19 +44,27 @@ if($staffenroll->is_cancelled()) {
     $courseurl = new moodle_url('/course/view.php', array('id' => $id));
     redirect($courseurl);
 } else if ($fromform = $staffenroll->get_data()) {
+
+    // FIXME: moodle has got to have a better way to handle this
+    // but for now, this will work
+    $tmp = $fromform['displaytext'];
+    if(is_array($tmp)) {
+        $fromform['displaytext'] = serialize($tmp);
+    }
+
     if (!$DB->insert_record('block_staffenroll', $fromform)) {
         print_error('inserterror', 'block_staffenroll');
     }
-    else {
-        $site = get_site();
-        echo $OUTPUT->header();
-        if ($viewpage) {
-            $staffenrollpage = $DB->get_record('block_staffenroll', array('id' => $id));
-            block_staffenroll_print_page($staffenrollpage);
-        } else {
-            $staffenroll->display();
-        }
-        echo $OUTPUT->footer();
+}
+else {
+    $site = get_site();
+    echo $OUTPUT->header();
+    if ($viewpage) {
+        $staffenrollpage = $DB->get_record('block_staffenroll', array('blockid' => $blockid));
+        block_staffenroll_print_page($staffenrollpage);
+    } else {
+        $staffenroll->display();
     }
+    echo $OUTPUT->footer();
 }
 
