@@ -53,6 +53,7 @@ class block_staffenroll extends block_base {
         }
 
         $context = context_course::instance($COURSE->id);
+        $this->content = new stdClass;
 
         if (has_capability('block/staffenroll:managepages', $context)) {
             $url = new moodle_url('/blocks/staffenroll/view.php',
@@ -72,7 +73,6 @@ class block_staffenroll extends block_base {
 
 
         // NOTE: this is simple tutorial code rewritten
-        $this->content = new stdClass;
         $textContent = array();
         if (!empty($this->config->text)) {
             $textContent[] = $this->config->text;
