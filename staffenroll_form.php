@@ -73,6 +73,8 @@ class staffenroll_form extends moodleform {
         $mform->setType('blockid', PARAM_INT);
         $mform->addElement('hidden', 'courseid');
         $mform->setType('courseid', PARAM_INT);
+        $mform->addElement('hidden', 'id');
+        $mform->setType('id', PARAM_INT);
 
         // reset & submit
         $this->add_action_buttons();

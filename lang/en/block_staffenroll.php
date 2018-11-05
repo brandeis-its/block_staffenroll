@@ -1,8 +1,6 @@
 <?php
 $string['pluginname'] = 'Staff enrollments';
 $string['staffenroll'] = 'Staff Enroll';
-// $string['staffenroll:addinstance'] = 'Add a new staff enrollments block';
-// $string['staffenroll:myaddinstance'] = 'Add a new staff enrollments block to the My Moodle page';
 $string['defaulttitle'] = 'Default Title';
 $string['defaultfooter'] = 'default footer';
 $string['blocksettings'] = 'Staff Enroll settings';
@@ -31,6 +29,12 @@ $string['pictureselect'] = 'default pictureselect value';
 $string['picturedesc'] = 'picture description';
 $string['optional'] = 'Optional';
 $string['displaydate'] = 'Display date';
+
+// PERMISSIONS
+$string['staffenroll:addinstance'] = 'Add a new staff enrollments block';
+$string['staffenroll:myaddinstance'] = 'Add a new staff enrollments block to the My Moodle page';
+$string['staffenroll:viewpages'] = 'View staff enroll pages';
+$string['staffenroll:managepages'] = 'Manage staff enroll pages';
 
 // FIXME: renamed (adjust within)
 //$string['all_courses_link_text'] = 'All Courses';

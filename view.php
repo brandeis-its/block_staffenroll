@@ -17,6 +17,10 @@ if (!$course = $DB->get_record('course', array('id' => $courseid))) {
     print_error('invalidcourse', 'block_staffenroll', $courseid);
 }
 require_login($course);
+require_capability(
+    'block/staffenroll:managepages',
+    context_course::instance($courseid)
+);
 
 $PAGE->set_url('/blocks/staffenroll/view.php', array('id' => $courseid));
 $PAGE->set_pagelayout('standard');
@@ -37,6 +41,7 @@ $staffenroll = new staffenroll_form();
 // pass data to form
 $toform['blockid'] = $blockid;
 $toform['courseid'] = $courseid;
+$toform['id'] = $id;
 $staffenroll->set_data($toform);
 
 if($staffenroll->is_cancelled()) {
@@ -45,23 +50,36 @@ if($staffenroll->is_cancelled()) {
     redirect($courseurl);
 } else if ($fromform = $staffenroll->get_data()) {
 
-    // FIXME: moodle has got to have a better way to handle this
-    // but for now, this will work
-    $tmp = $fromform['displaytext'];
-    if(is_array($tmp)) {
-        $fromform['displaytext'] = serialize($tmp);
-    }
+    // FIXME: is there a core moodle function to do this?
+    // displaytext property returns an array
+    // can i shove it in db in one step?
+    $displaytext = $fromform->displaytext;
+    $fromform->displaytext = $displaytext['text'];
+    $fromform->format = $displaytext['format'];
 
-    if (!$DB->insert_record('block_staffenroll', $fromform)) {
-        print_error('inserterror', 'block_staffenroll');
+    // We need to add code to appropriately act on and store the submitted data
+    if ($fromform->id != 0) {
+        if (! $DB->update_record('block_staffenroll', $fromform)) {
+            print_error('updateerror', 'block_staffenroll');
+        }
+    } else {
+        if (! $DB->insert_record('block_staffenroll', $fromform)) {
+            print_error('inserterror', 'block_staffenroll');
+        }
     }
 }
 else {
+    // form didn't validate or this is the first display
     $site = get_site();
     echo $OUTPUT->header();
-    if ($viewpage) {
-        $staffenrollpage = $DB->get_record('block_staffenroll', array('blockid' => $blockid));
-        block_staffenroll_print_page($staffenrollpage);
+    if ($id) {
+        $staffenrollpage = $DB->get_record('block_staffenroll', array('id' => $id));
+        if($viewpage) {
+            block_staffenroll_print_page($staffenrollpage);
+        } else {
+            $staffenroll->set_data($staffenrollpage);
+            $staffenroll->display();
+        }
     } else {
         $staffenroll->display();
     }

@@ -1,5 +1,6 @@
 <?php
 class block_staffenroll extends block_base {
+
     public function init() {
         $this->title = get_string('staffenroll', 'block_staffenroll');
     }
@@ -43,30 +44,40 @@ class block_staffenroll extends block_base {
     }
 
 
+    // populates block
     function get_content() {
-        global $COURSE, $DB;
+        global $COURSE, $DB, $PAGE;
 
         if ($this->content !== NULL) {
             return $this->content;
         }
 
-        if (!empty($this->config->text)) {
-            $this->content->text = $this->config->text;
+        $context = context_course::instance($COURSE->id);
+
+        if (has_capability('block/staffenroll:managepages', $context)) {
+            $url = new moodle_url('/blocks/staffenroll/view.php',
+                array('blockid' => $this->instance->id, 'courseid' => $COURSE->id)
+            );
+            $this->content->footer = html_writer::link(
+                $url, get_string('addpage', 'block_staffenroll')
+            );
+        } else {
+            $this->content->footer = '';
         }
 
+        // Check to see if we are in editing mode and that we can manage pages.
+        $canmanage = has_capability('block/staffenroll:managepages', $context) &&
+            $PAGE->user_is_editing($this->instance->id);
+        $canview = has_capability('block/staffenroll:viewpages', $context);
+
+
+        // NOTE: this is simple tutorial code rewritten
         $this->content = new stdClass;
         $textContent = array();
+        if (!empty($this->config->text)) {
+            $textContent[] = $this->config->text;
+        }
 
-        $footerURL = new moodle_url(
-            '/blocks/staffenroll/view.php',
-            array('blockid' => $this->instance->id, 'courseid' => $COURSE->id)
-        );
-        $this->content->footer = html_writer::link(
-            $footerURL,
-            get_string('addpage', 'block_staffenroll')
-        );
-
-        // NOTE: this is tutorial code rewritten
         $textContent[] = html_writer::start_tag('ul',
             array('class' => 'staffenroll')
         );
@@ -91,41 +102,100 @@ class block_staffenroll extends block_base {
             array('href' => 'https://lipsum.com', 'target' => '_blank')
         );
         $textContent[] = html_writer::end_tag('li');
-
         $textContent[] = html_writer::end_tag('ul');
 
-        // This is the new code.
-        $staffenrollpages = $DB->get_records('block_staffenroll',
-            array('blockid' => $this->instance->id)
-        );
-        if ($staffenrollpages) {
+
+
+
+        // Check to see if we are in editing mode
+        $canmanage = $PAGE->user_is_editing($this->instance->id);
+
+        if (
+            $staffenrollpages = $DB->get_records(
+                'block_staffenroll',
+                array('blockid' => $this->instance->id)
+            )
+        ) {
             $textContent[] = html_writer::start_tag('ul');
             foreach ($staffenrollpages as $sep) {
+                if ($canmanage) {
+                    // edit
+                    $editparam = array(
+                        'blockid' => $this->instance->id,
+                        'courseid' => $COURSE->id,
+                        'id' => $sep->id
+                    );
+                    $editurl = new moodle_url('/blocks/staffenroll/view.php', $editparam);
+                    $editpicurl = new moodle_url('/pix/t/edit.gif');
+                    $edit = html_writer::link(
+                        $editurl,
+                        html_writer::tag(
+                            'img', '',
+                            array(
+                                'src' => $editpicurl,
+                                'alt' => get_string('edit')
+                            )
+                        )
+                    );
 
-                // FIXME: is this param even needed?
-                $id = $COURSE->id;
-                if(isset($sep->id)) {
-                    $id = $sep->id;
+                    //delete
+                    $deleteparam = array(
+                        'id' => $simplehtmlpage->id,
+                        'courseid' => $COURSE->id
+                    );
+                    $deleteurl = new moodle_url('/blocks/simplehtml/delete.php', $deleteparam);
+                    $deletepicurl = new moodle_url('/pix/t/delete.gif');
+                    $delete = html_writer::link(
+                        $deleteurl, html_writer::tag(
+                            'img', '',
+                            array(
+                                'src' => $deletepicurl,
+                                'alt' => get_string('delete')
+                            )
+                        )
+                    );
+                } else {
+                    $edit = '';
+                    $delete = '';
                 }
                 $pageurl = new moodle_url(
                     '/blocks/staffenroll/view.php',
                     array(
                         'blockid' => $this->instance->id,
                         'courseid' => $COURSE->id,
-                        'id' => $id,
-                        'viewpage' => '1'
+                        'id' => $sep->id,
+                        'viewpage' => true
                     )
                 );
                 $textContent[] = html_writer::start_tag('li');
-                $textContent[] = html_writer::link($pageurl, $sep->pagetitle);
+
+                if ($canview) {
+                    $textContent[] = html_writer::link($pageurl, $sep->pagetitle);
+                } else {
+                    $textContent[] = html_writer::tag('div', $sep->pagetitle);
+                }
+
+                $textContent[] = $edit;
+                $textContent[] = $delete;
                 $textContent[] = html_writer::end_tag('li');
             }
+
             $textContent[] = html_writer::end_tag('ul');
         }
 
         $this->content->text = implode("\n", $textContent);
         return $this->content;
     }
+
+
+    // remove from db
+    public function instance_delete() {
+        global $DB;
+        $DB->delete_records('block_staffenroll',
+            array('blockid' => $this->instance->id));
+    }
+
+
 }
 
 /*
