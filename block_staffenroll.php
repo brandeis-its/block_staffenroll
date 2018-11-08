@@ -16,7 +16,7 @@ class block_staffenroll extends block_base {
     // i've included it
     public function applicable_formats() {
         return array(
-            'site-index' => true,
+            'my' => true,
             'course-view' => true,
         );
     }
@@ -31,11 +31,15 @@ class block_staffenroll extends block_base {
 
         $this->content = new stdClass;
         $contentText = array();
-        // FIXME: checking context 
+        // FIXME: checking context
         // so enrol shows up on my page and
         // unenrol on course page
-        $contentText[] = "current context: $this->context";
-        $contentText[] = "current page context: $this->page->context";
+        $rawContext = $this->context;
+        $dbug = var_export($rawContext, true);
+        $contentText[] = "rawContext: $dbug";
+        $pageContext = $this->page->context;
+        $dbug = var_export($pageContext, true);
+        $contentText[] = "current page context: $dbug";
         $this->content->text = implode("<br/>", $contentText);
         $this->content->footer = '';
         return $this->content;
