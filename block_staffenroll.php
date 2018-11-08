@@ -31,15 +31,14 @@ class block_staffenroll extends block_base {
 
         $this->content = new stdClass;
         $contentText = array();
-        // FIXME: checking context
-        // so enrol shows up on my page and
-        // unenrol on course page
-        $rawContext = $this->context;
-        $dbug = var_export($rawContext, true);
-        $contentText[] = "rawContext: $dbug";
-        $pageContext = $this->page->context;
-        $dbug = var_export($pageContext, true);
-        $contentText[] = "current page context: $dbug";
+        $currentContext = $this->page->context;
+        if($currentContext->contextlevel == CONTEXT_COURSE){
+            $contentText[] = 'unenroll link';
+        }
+        else if($currentContext->contextlevel == CONTENT_USER){
+            $contentText[] = 'enroll link';
+        }
+           
         $this->content->text = implode("<br/>", $contentText);
         $this->content->footer = '';
         return $this->content;
