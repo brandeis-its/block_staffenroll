@@ -35,8 +35,12 @@ class block_staffenroll extends block_base {
         if($currentContext->contextlevel == CONTEXT_COURSE){
             $contentText[] = 'unenroll link';
         }
-        else if($currentContext->contextlevel == CONTENT_USER){
+        else if($currentContext->contextlevel == CONTEXT_USER){
             $contentText[] = 'enroll link';
+        }
+        // FIXME: only used in development, please remove before production
+        else {
+            $contentText[] = 'error!';
         }
            
         $this->content->text = implode("<br/>", $contentText);
