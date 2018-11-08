@@ -1,4 +1,5 @@
 <?php
+$string['staffenroll'] = 'Staff Enroll';
 $string['pluginname'] = 'Staff enrollments';
 $string['instructorroleslabel'] = 'Instructor roles';
 $string['instructorrolesdesc'] = 'Check box[es] of instructor role[s]';

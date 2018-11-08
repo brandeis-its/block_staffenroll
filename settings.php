@@ -20,7 +20,7 @@ foreach ($contextcourseroles as $roleid) {
 $settings->add(
     new admin_setting_configmulticheckbox(
         'block_staffenroll/instructorroles',
-        get_string('insructorroleslabel', 'block_staffenroll'),
+        get_string('instructorroleslabel', 'block_staffenroll'),
         get_string('instructorrolesdesc', 'block_staffenroll'),
         NULL,
         $roles
