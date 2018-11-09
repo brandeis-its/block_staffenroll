@@ -6,16 +6,20 @@ function staffenroll_get_support_roles() {
     $roles = array(
         'student_support' => array(
             'name'   => 'Student',
-            'cap'    => 'local/support_staff_enroll:enroll_as_student_support',
-            'roleid' => get_config( 'support_staff_enroll',
-            'student_support_role' ),
+            'cap'    =>  'block/staffenroll:studentenableenrol',
+            'roleid' => get_config(
+                'block_staffenroll',
+                'studentrole'
+            ),
         ),
 
         'staff_support' => array(
             'name'   => 'Staff',
-            'cap'    => 'local/support_staff_enroll:enroll_as_staff_support',
-            'roleid' => get_config( 'support_staff_enroll',
-            'staff_support_role' ),
+            'cap'    =>  'block/staffenroll:staffenableenrol',
+            'roleid' => get_config(
+                'block_staffenroll',
+                'staffrole'
+            ),
         ),
     );
 

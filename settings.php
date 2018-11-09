@@ -1,6 +1,7 @@
 <?php
 defined('MOODLE_INTERNAL') || die;
 
+/*
 // FIXME: is this needed?
 if (! $hassiteconfig) {
     error_log('!! $hassiteconfig false');
@@ -8,6 +9,7 @@ if (! $hassiteconfig) {
     $dashboardurl = new moodle_url('/my');
     redirect($dashboard);
 }
+ */
 
 // roles
 $courseRoles = array();
@@ -17,11 +19,11 @@ foreach ($roleids as $rid) {
     $courseRoles[$rid] = $dbrole->name;
 }
 
-$userRoles = array();
-$roleids = get_roles_for_contextlevels(CONTEXT_USER);
+$systemRoles = array();
+$roleids = get_roles_for_contextlevels(CONTEXT_SYSTEM);
 foreach ($roleids as $rid) {
     $dbrole = $DB->get_record('role', array('id' => $rid));
-    $userRoles[$rid] = $dbrole->name;
+    $systemRoles[$rid] = $dbrole->name;
 }
 
 $settings->add(
@@ -41,7 +43,7 @@ $settings->add(
         get_string('studentenableroleslabel', 'block_staffenroll'),
         get_string('studentenablerolesdesc', 'block_staffenroll'),
         NULL,
-        $userRoles
+        $systemRoles
     )
 );
 
@@ -51,7 +53,7 @@ $settings->add(
         get_string('staffenableroleslabel', 'block_staffenroll'),
         get_string('staffenablerolesdesc', 'block_staffenroll'),
         NULL,
-        $userRoles
+        $systemRoles
     )
 );
 

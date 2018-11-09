@@ -1,5 +1,13 @@
 <?php
 $capabilities = array(
+    'block/staffenroll:studentenableenrol' => array(
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+    ),
+    'block/staffenroll:staffenableenroll' => array(
+        'captype'      => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+    ),
     'block/staffenroll:studentenroll' => array(
         'captype'      => 'write',
         'contextlevel' => CONTEXT_SYSTEM,
