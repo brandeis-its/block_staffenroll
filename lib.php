@@ -2,7 +2,7 @@
 
 // get information about support staff roles, and which permission
 // is required to enroll in each role
-function support_staff_enrollments_get_support_roles() {
+function staffenroll_get_support_roles() {
     $roles = array(
         'student_support' => array(
             'name'   => 'Student',
@@ -23,17 +23,17 @@ function support_staff_enrollments_get_support_roles() {
 }
 
 // get a link to the support staff enrollment course browser
-function support_staff_enrollments_get_all_courses_link() {
+function staffenroll_get_all_courses_link() {
     $url = new moodle_url('/local/support_staff_enroll/courses_view.php');
 
     $link_text = get_string( 'all_courses_link_text',
-        'block_support_staff_enrollments' );
+        'block_staffenroll' );
 
     return html_writer::link($url, $link_text);
 }
 
 // returns 1 if the current user can enroll as some type of support staff
-function support_staff_enrollments_can_enroll($roles) {
+function staffenroll_can_enroll($roles) {
     $context = context_system::instance();
 
     foreach ($roles as $type => $data) {
@@ -46,7 +46,7 @@ function support_staff_enrollments_can_enroll($roles) {
 }
 
 // get existing enrollments for the current user as some kind of support staff
-function support_staff_enrollments_get_enrollments($roles) {
+function staffenroll_get_enrollments($roles) {
     global $USER, $DB;
 
     // get a list of roleids
@@ -70,17 +70,17 @@ function populateEnrollLink($ct = array()) {
 
     // get information about support staff roles, and which permission
     // is required to enroll in each role
-    $roles = support_staff_enrollments_get_support_roles();
+    $roles = staffenroll_get_support_roles();
 
     // if the current user has permission, show the link to find
     // a course to enroll in as a support staff person
-    if ( support_staff_enrollments_can_enroll($roles) ) {
+    if ( staffenroll_can_enroll($roles) ) {
         $ct[]
-            = support_staff_enrollments_get_all_courses_link($roles);
+            = staffenroll_get_all_courses_link($roles);
     }
 
     // get existing support staff enrollments
-    $enrollments = support_staff_enrollments_get_enrollments($roles);
+    $enrollments = staffenroll_get_enrollments($roles);
 
     // add links to courses the user is currently enrolled as support staff
     foreach ($enrollments as $enrollment) {
