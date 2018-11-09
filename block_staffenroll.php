@@ -1,4 +1,5 @@
 <?php
+
 class block_staffenroll extends block_base {
 
     public function init() {
@@ -37,14 +38,19 @@ class block_staffenroll extends block_base {
         }
         else if($currentContext->contextlevel == CONTEXT_USER){
             $contentText[] = 'enroll link';
+            //populateEnrollLink($contentText);
         }
         // FIXME: only used in development, please remove before production
         else {
             $contentText[] = 'error!';
         }
-           
-        $this->content->text = implode("<br/>", $contentText);
+
+        $this->content->text = implode("\n", $contentText);
         $this->content->footer = '';
         return $this->content;
     }
+
+
 }
+
+require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
