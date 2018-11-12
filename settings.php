@@ -12,6 +12,8 @@ if (! $hassiteconfig) {
  */
 
 // roles
+// FIXME: maybe these should be function calls from lib
+// $courseRoles = staffenroll_getcourseroles()
 $courseRoles = array();
 $roleids = get_roles_for_contextlevels(CONTEXT_COURSE);
 foreach ($roleids as $rid) {
@@ -19,6 +21,8 @@ foreach ($roleids as $rid) {
     $courseRoles[$rid] = $dbrole->name;
 }
 
+// FIXME: lib?
+// $systemRoles = staffenroll_getsystemroles()
 $systemRoles = array();
 $roleids = get_roles_for_contextlevels(CONTEXT_SYSTEM);
 foreach ($roleids as $rid) {
@@ -26,16 +30,16 @@ foreach ($roleids as $rid) {
     $systemRoles[$rid] = $dbrole->name;
 }
 
+
+// ENABLE
+
 $settings->add(
-    new admin_setting_configmulticheckbox(
-        'block_staffenroll/instructorroles',
-        get_string('instructorroleslabel', 'block_staffenroll'),
-        get_string('instructorrolesdesc', 'block_staffenroll'),
-        NULL,
-        $courseRoles
+    new admin_setting_heading(
+        'block_staffenroll/enableroles',
+        get_string('enableroleslabel', 'block_staffenroll'),
+        get_string('enablerolesdesc', 'block_staffenroll')
     )
 );
-
 
 $settings->add(
     new admin_setting_configselect(
@@ -54,6 +58,27 @@ $settings->add(
         get_string('staffenablerolesdesc', 'block_staffenroll'),
         NULL,
         $systemRoles
+    )
+);
+
+
+// ASSIGN
+
+$settings->add(
+    new admin_setting_heading(
+        'block_staffenroll/assignroles',
+        get_string('assignroleslabel', 'block_staffenroll'),
+        get_string('assignrolesdesc', 'block_staffenroll')
+    )
+);
+
+$settings->add(
+    new admin_setting_configmulticheckbox(
+        'block_staffenroll/instructorroles',
+        get_string('instructorroleslabel', 'block_staffenroll'),
+        get_string('instructorrolesdesc', 'block_staffenroll'),
+        NULL,
+        $courseRoles
     )
 );
 

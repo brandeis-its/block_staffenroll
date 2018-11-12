@@ -1,6 +1,6 @@
 <?php
 $plugin->component = 'block_staffenroll';
-$plugin->version = 2018110902;
+$plugin->version = 2018111200;
 
 // moodle 2.0
 $plugin->requires = 2010112400;
