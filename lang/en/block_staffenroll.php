@@ -1,6 +1,6 @@
 <?php
-$string['staffenroll'] = 'Staff Enroll';
 $string['pluginname'] = 'Staff enrollments';
+$string['staffenroll'] = 'Staff Enroll';
 $string['enableroleslabel'] = 'Enabling Roles';
 $string['enablerolesdesc'] = 'Roles that allow users to be assigned staff enrollments';
 $string['studentenableroleslabel'] = 'Student enable roles';
@@ -15,3 +15,7 @@ $string['studentroleslabel'] = 'Student roles';
 $string['studentrolesdesc'] = 'Select temporary student role';
 $string['staffroleslabel'] = 'Staff roles';
 $string['staffrolesdesc'] = 'Select temporary staff role';
+$string['staffenroll:studentenroll'] = 'Allows for student to be temporarily enrolled';
+$string['staffenroll:staffenroll'] = 'Allows for staff to be temporarily enrolled';
+$string['staffenroll:addinstance'] = 'Add new staff enroll block';
+$string['staffenroll:myaddinstance'] = 'Add new staff enroll block to "my" page';

@@ -1,8 +1,9 @@
 <?php
 
-// get information about support staff roles, and which permission
-// is required to enroll in each role
-function staffenroll_get_support_roles() {
+// returns 1 if the current user can enroll as some type of support staff
+function staffenroll_can_enroll($roles) {
+    // get information about support staff roles, and which permission
+    // is required to enroll in each role
     $roles = array(
         'student_support' => array(
             'name'   => 'Student',
@@ -23,7 +24,15 @@ function staffenroll_get_support_roles() {
         ),
     );
 
-    return $roles;
+    $context = context_system::instance();
+
+    foreach ($roles as $type => $data) {
+        if ( has_capability( $data['cap'], $context) ) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 // get a link to the support staff enrollment course browser
@@ -34,19 +43,6 @@ function staffenroll_get_all_courses_link() {
         'block_staffenroll' );
 
     return html_writer::link($url, $link_text);
-}
-
-// returns 1 if the current user can enroll as some type of support staff
-function staffenroll_can_enroll($roles) {
-    $context = context_system::instance();
-
-    foreach ($roles as $type => $data) {
-        if ( has_capability( $data['cap'], $context) ) {
-            return 1;
-        }
-    }
-
-    return 0;
 }
 
 // get existing enrollments for the current user as some kind of support staff
@@ -72,9 +68,6 @@ function staffenroll_get_enrollments($roles) {
 
 function populateEnrollLink($ct = array()) {
 
-    // get information about support staff roles, and which permission
-    // is required to enroll in each role
-    $roles = staffenroll_get_support_roles();
 
     // if the current user has permission, show the link to find
     // a course to enroll in as a support staff person

@@ -49,8 +49,6 @@ class block_staffenroll extends block_base {
         $this->content->footer = '';
         return $this->content;
     }
-
-
 }
 
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
