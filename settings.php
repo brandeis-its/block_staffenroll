@@ -61,6 +61,15 @@ $settings->add(
     )
 );
 
+// FIXME: validate input for this one
+$settings->add(
+    new admin_setting_configtext(
+        'block_staffenroll/allowednetwork',
+        get_string('allowednetworklabel', 'block_staffenroll'),
+        get_string('allowednetworkdesc', 'block_staffenroll'),
+        '0.0.0.0/0'
+    )
+);
 
 // ASSIGN
 
@@ -69,16 +78,6 @@ $settings->add(
         'block_staffenroll/assignroles',
         get_string('assignroleslabel', 'block_staffenroll'),
         get_string('assignrolesdesc', 'block_staffenroll')
-    )
-);
-
-$settings->add(
-    new admin_setting_configmulticheckbox(
-        'block_staffenroll/instructorroles',
-        get_string('instructorroleslabel', 'block_staffenroll'),
-        get_string('instructorrolesdesc', 'block_staffenroll'),
-        NULL,
-        $courseRoles
     )
 );
 
