@@ -61,15 +61,6 @@ $settings->add(
     )
 );
 
-// FIXME: validate input for this one
-$settings->add(
-    new admin_setting_configtext(
-        'block_staffenroll/allowednetwork',
-        get_string('allowednetworklabel', 'block_staffenroll'),
-        get_string('allowednetworkdesc', 'block_staffenroll'),
-        '0.0.0.0/0'
-    )
-);
 
 // ASSIGN
 
@@ -100,5 +91,26 @@ $settings->add(
         get_string('staffrolesdesc', 'block_staffenroll'),
         NULL,
         $courseRoles
+    )
+);
+
+
+// ADDITIONAL
+
+$settings->add(
+    new admin_setting_heading(
+        'block_staffenroll/additional',
+        get_string('additionallabel', 'block_staffenroll'),
+        get_string('additionaldesc', 'block_staffenroll')
+    )
+);
+
+// FIXME: validate input for this one
+$settings->add(
+    new admin_setting_configtext(
+        'block_staffenroll/allowednetwork',
+        get_string('allowednetworklabel', 'block_staffenroll'),
+        get_string('allowednetworkdesc', 'block_staffenroll'),
+        '0.0.0.0/0'
     )
 );
