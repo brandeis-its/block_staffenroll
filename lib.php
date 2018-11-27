@@ -4,9 +4,9 @@
 
 function staffenroll_getcourseroles() {
     $courseRoles = array();
-    $roleids = get_roles_for_contextlevels(CONTEXT_COURSE);
-    foreach ($roleids as $rid) {
-        $dbrole = $DB->get_record('role', array('id' => $rid));
+    $roles = get_roles_for_contextlevels(CONTEXT_COURSE);
+    foreach ($roles as $r) {
+        $dbrole = $DB->get_record('role', array('id' => $r->id));
         $courseRoles[$rid] = $dbrole->name;
     }
     return $courseRoles;
@@ -14,9 +14,9 @@ function staffenroll_getcourseroles() {
 
 function staffenroll_getsystemroles() {
     $systemRoles = array();
-    $roleids = get_roles_for_contextlevels(CONTEXT_SYSTEM);
-    foreach ($roleids as $rid) {
-        $dbrole = $DB->get_record('role', array('id' => $rid));
+    $roles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
+    foreach ($roles as $r) {
+        $dbrole = $DB->get_record('role', array('id' => $r->id));
         $systemRoles[$rid] = $dbrole->name;
     }
     return $systemRoles;
@@ -114,15 +114,15 @@ function populateEnrollLink($ct = array(), $courseid = 0) {
     $enrollments = staffenroll_getenrollments();
 
     // add links to courses the user is currently enrolled as support staff
-    foreach($enrollments as $enroll) {
+    foreach($enrollments as $e) {
         $url = new moodle_url(
             '/course/view.php',
-            array('id' => $enrollment->courseid)
+            array('id' => $e->courseid)
         );
-        $course_label = $enrollment->course_shortname or $enrollment->courseid;
+        $course_label = $e->course_shortname or $e->courseid;
         $link_text = implode(' ', array(
             $course_label,
-            '(' . $enrollment->role_name . ')'
+            '(' . $e->role_name . ')'
         ));
         $ct[] = html_writer::link($url, $link_text);
     }
