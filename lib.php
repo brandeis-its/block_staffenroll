@@ -6,8 +6,11 @@ function staffenroll_getcourseroles() {
     $courseRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_COURSE);
     foreach ($roles as $r) {
-        $dbrole = $DB->get_record('role', array('id' => $r->id));
-        $courseRoles[$rid] = $dbrole->name;
+        $dbug = var_export($r, true);
+        error_log('!!! role $r ' . $dbug);
+        // FIXME: this is broken
+        //$dbrole = $DB->get_record('role', array('id' => $r->id));
+        //$courseRoles[$rid] = $dbrole->name;
     }
     return $courseRoles;
 }
@@ -15,10 +18,11 @@ function staffenroll_getcourseroles() {
 function staffenroll_getsystemroles() {
     $systemRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
-    foreach ($roles as $r) {
+/*    foreach ($roles as $r) {
         $dbrole = $DB->get_record('role', array('id' => $r->id));
         $systemRoles[$rid] = $dbrole->name;
     }
+ */
     return $systemRoles;
 }
 
