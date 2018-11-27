@@ -1,6 +1,12 @@
 <?php
 $string['pluginname'] = 'Staff enrollments';
 $string['staffenroll'] = 'Staff Enroll';
+$string['allcourseslink'] = 'All courses';
+// SETTINGS
+$string['staffenroll:studentenroll'] = 'Allows for student to be temporarily enrolled';
+$string['staffenroll:staffenroll'] = 'Allows for staff to be temporarily enrolled';
+$string['staffenroll:addinstance'] = 'Add new staff enroll block';
+$string['staffenroll:myaddinstance'] = 'Add new staff enroll block to "my" page';
 $string['enableroleslabel'] = 'Enabling Roles';
 $string['enablerolesdesc'] = 'Roles that allow users to be assigned staff enrollments';
 $string['studentenableroleslabel'] = 'Student enable roles';
@@ -14,10 +20,6 @@ $string['studentrolesdesc'] = 'Select temporary student role';
 $string['staffroleslabel'] = 'Staff roles';
 $string['staffrolesdesc'] = 'Select temporary staff role';
 $string['additionallabel'] = 'Additional Configuration';
-$string['additonaldesc'] = 'Configure additional behavior[s] for the block';
+$string['additionaldesc'] = 'Configure additional behavior[s] for the block';
 $string['allowednetworklabel'] = 'Allowed network';
-$string['allowednetworkdesc'] = 'Enter a network CIDR combination to limit access (default allows all)';
-$string['staffenroll:studentenroll'] = 'Allows for student to be temporarily enrolled';
-$string['staffenroll:staffenroll'] = 'Allows for staff to be temporarily enrolled';
-$string['staffenroll:addinstance'] = 'Add new staff enroll block';
-$string['staffenroll:myaddinstance'] = 'Add new staff enroll block to "my" page';
+$string['allowednetworkdesc'] = 'Enter a network/CIDR combination to limit access (default allows all)';

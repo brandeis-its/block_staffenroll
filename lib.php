@@ -1,97 +1,130 @@
 <?php
 
-// returns 1 if the current user can enroll as some type of support staff
-function staffenroll_can_enroll($roles) {
-    // get information about support staff roles, and which permission
-    // is required to enroll in each role
-    $roles = array(
-        'student_support' => array(
-            'name'   => 'Student',
-            'cap'    =>  'block/staffenroll:studentenableenrol',
-            'roleid' => get_config(
-                'block_staffenroll',
-                'studentrole'
-            ),
-        ),
+// SETTINGS
 
-        'staff_support' => array(
-            'name'   => 'Staff',
-            'cap'    =>  'block/staffenroll:staffenableenrol',
-            'roleid' => get_config(
-                'block_staffenroll',
-                'staffrole'
-            ),
-        ),
-    );
-
-    $context = context_system::instance();
-
-    foreach ($roles as $type => $data) {
-        if ( has_capability( $data['cap'], $context) ) {
-            return 1;
-        }
+function staffenroll_getcourseroles() {
+    $courseRoles = array();
+    $roleids = get_roles_for_contextlevels(CONTEXT_COURSE);
+    foreach ($roleids as $rid) {
+        $dbrole = $DB->get_record('role', array('id' => $rid));
+        $courseRoles[$rid] = $dbrole->name;
     }
-
-    return 0;
+    return $courseRoles;
 }
 
-// get a link to the support staff enrollment course browser
-function staffenroll_get_all_courses_link() {
-    $url = new moodle_url('/local/support_staff_enroll/courses_view.php');
+function staffenroll_getsystemroles() {
+    $systemRoles = array();
+    $roleids = get_roles_for_contextlevels(CONTEXT_SYSTEM);
+    foreach ($roleids as $rid) {
+        $dbrole = $DB->get_record('role', array('id' => $rid));
+        $systemRoles[$rid] = $dbrole->name;
+    }
+    return $systemRoles;
+}
 
-    $link_text = get_string( 'all_courses_link_text',
-        'block_staffenroll' );
 
-    return html_writer::link($url, $link_text);
+// BLOCK
+
+// returns true if the current user can enroll as some type of support staff
+function staffenroll_canenroll($courseid) {
+    $context = context_course::instance($courseid);
+    $enroll =  has_capability(
+        'block/staffenroll:staffenroll',
+        $context
+    );
+    if($enroll) {
+        return true;
+    }
+    $enroll =  has_capability(
+        'block/studentenroll:studentenroll',
+        $context
+    );
+    if($enroll) {
+        return true;
+    }
+
+    return false;
 }
 
 // get existing enrollments for the current user as some kind of support staff
-function staffenroll_get_enrollments($roles) {
+function staffenroll_getenrollments() {
     global $USER, $DB;
+    $courseroles = staffenroll_getcourseroles();
 
     // get a list of roleids
-    $roleids = array_map( function($e) { return $e['roleid']; }, $roles );
+    $roleids = array_map(
+        function($e) { return $e['roleid']; },
+        $courseroles
+    );
+    $totalroleids = count($roleids);
+    $roleidsql = '';
+    if($totalroleids == 0) {
+        // FIXME: this is an error
+        // handle it in some way
+        return false;
+    }
+    else if($totalroleids == 1){
+        $roleidsql = implode(' ', array(
+            'where roleid =',
+            $roleids[0]
+        ));
+    }
+    else {
+        $roleidsql = implode(' ', array(
+            'where roleid in (',
+            join(', ', $roleids),
+            ')'
+        ));
+    }
 
-    $query  = "select c.id as courseid, c.idnumber as course_idnumber, c.shortname as course_shortname,"
-        . " r.name as role_name, r.id as roleid from"
-        . " mdl_role r, mdl_role_assignments ra, mdl_context x, mdl_course c"
-        . " where r.id in ('"
-        . join("','", $roleids) . "')"
-        . " and r.id=ra.roleid and ra.userid = " . $USER->id
-        . " and ra.contextid = x.id and c.id = x.instanceid"
-        . " order by c.idnumber";
-
+    $query = implode(' ', array(
+        "SELECT c.id AS courseid, c.idnumber AS course_idnumber,",
+        "c.shortname AS course_shortname, r.name AS role_name,",
+        "r.id AS roleid",
+        "FROM mdl_role r, mdl_role_assignments ra,",
+        " mdl_context x, mdl_course c",
+        "WHERE",
+        $roleidsql,
+        "AND r.id=ra.roleid",
+        "AND ra.userid =",
+        $USER->id,
+        "AND ra.contextid = x.id AND c.id = x.instanceid",
+        "ORDER BY c.idnumber"
+    ));
     $enrollments = $DB->get_records_sql($query);
-
     return $enrollments;
 }
 
-function populateEnrollLink($ct = array()) {
-
-
-    // if the current user has permission, show the link to find
-    // a course to enroll in as a support staff person
-    if ( staffenroll_can_enroll($roles) ) {
-        $ct[]
-            = staffenroll_get_all_courses_link($roles);
+function populateEnrollLink($ct = array(), $courseid = 0) {
+    if(! staffenroll_canenroll($courseid)) {
+        $ct[] = 'no permission to enroll';
+        return;
     }
 
-    // get existing support staff enrollments
-    $enrollments = staffenroll_get_enrollments($roles);
+    $url = new moodle_url(
+        '/local/support_staff_enroll/courses_view.php'
+    );
+    $link_text = get_string(
+        'allcourseslink',
+        'block_staffenroll'
+    );
+    $ct[] = html_writer::link($url, $link_text);
+
+    // get existing support staff course enrollments
+    $enrollments = staffenroll_getenrollments();
 
     // add links to courses the user is currently enrolled as support staff
-    foreach ($enrollments as $enrollment) {
-        $url = new moodle_url( '/course/view.php', array( 'id' => $enrollment->courseid ) );
-
+    foreach($enrollments as $enroll) {
+        $url = new moodle_url(
+            '/course/view.php',
+            array('id' => $enrollment->courseid)
+        );
         $course_label = $enrollment->course_shortname or $enrollment->courseid;
-        $link_text = implode( ' ', array(
+        $link_text = implode(' ', array(
             $course_label,
             '(' . $enrollment->role_name . ')'
-        ) );
-
+        ));
         $ct[] = html_writer::link($url, $link_text);
     }
-
     return $ct;
 }
-// end

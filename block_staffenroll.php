@@ -24,7 +24,7 @@ class block_staffenroll extends block_base {
 
 
     function get_content() {
-        global $COURSE, $DB, $PAGE;
+        global $COURSE, $USER;
 
         if ($this->content !== NULL) {
             return $this->content;
@@ -37,8 +37,8 @@ class block_staffenroll extends block_base {
             $contentText[] = 'unenroll link';
         }
         else if($currentContext->contextlevel == CONTEXT_USER){
-            $contentText[] = 'enroll link';
-            //populateEnrollLink($contentText);
+            //$contentText[] = 'enroll link';
+            populateEnrollLink($contentText, $USER->id);
         }
         // FIXME: only used in development, please remove before production
         else {
@@ -51,4 +51,4 @@ class block_staffenroll extends block_base {
     }
 }
 
-require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
+// require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');

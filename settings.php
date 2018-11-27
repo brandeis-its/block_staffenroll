@@ -1,6 +1,8 @@
 <?php
 defined('MOODLE_INTERNAL') || die;
 
+require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
+
 /*
 // FIXME: is this needed?
 if (! $hassiteconfig) {
@@ -11,24 +13,8 @@ if (! $hassiteconfig) {
 }
  */
 
-// roles
-// FIXME: maybe these should be function calls from lib
-// $courseRoles = staffenroll_getcourseroles()
-$courseRoles = array();
-$roleids = get_roles_for_contextlevels(CONTEXT_COURSE);
-foreach ($roleids as $rid) {
-    $dbrole = $DB->get_record('role', array('id' => $rid));
-    $courseRoles[$rid] = $dbrole->name;
-}
-
-// FIXME: lib?
-// $systemRoles = staffenroll_getsystemroles()
-$systemRoles = array();
-$roleids = get_roles_for_contextlevels(CONTEXT_SYSTEM);
-foreach ($roleids as $rid) {
-    $dbrole = $DB->get_record('role', array('id' => $rid));
-    $systemRoles[$rid] = $dbrole->name;
-}
+$courseRoles = staffenroll_getcourseroles();
+$systemRoles = staffenroll_getsystemroles();
 
 
 // ENABLE
