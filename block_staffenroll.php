@@ -1,4 +1,5 @@
 <?php
+require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
 class block_staffenroll extends block_base {
 
@@ -40,9 +41,8 @@ class block_staffenroll extends block_base {
             //$contentText[] = 'enroll link';
             populateEnrollLink($contentText, $USER->id);
         }
-        // FIXME: only used in development, please remove before production
         else {
-            $contentText[] = 'error!';
+            $contentText[] = 'cannot place block in this context.';
         }
 
         $this->content->text = implode("\n", $contentText);
@@ -51,4 +51,3 @@ class block_staffenroll extends block_base {
     }
 }
 
-// require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
