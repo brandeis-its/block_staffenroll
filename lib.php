@@ -60,13 +60,13 @@ function staffenroll_getenrollments() {
     }
     else if($totalroleids == 1){
         $roleidsql = implode(' ', array(
-            'where roleid =',
+            'where r.id =',
             $roleids[0]
         ));
     }
     else {
         $roleidsql = implode(' ', array(
-            'where roleid in (',
+            'where r.id in (',
             join(', ', $roleids),
             ')'
         ));
