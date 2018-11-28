@@ -11,9 +11,15 @@ function staffenroll_getcourseroles() {
     $dbug = var_export($roles, true);
     error_log('!!! course $roles: ' . $dbug);
 
-    foreach ($roles as $r) {
-        $dbrole = $DB->get_record('role', array('id' => $r));
-        $courseRoles[$r] = $dbrole->name;
+    // $rclid Role Context Level ID
+    foreach ($roles as $rclid => $rid) {
+        $dbrole = $DB->get_record('role', array('id' => $rid));
+
+        // DEBUG
+        $dbug = var_export($dbrole, true);
+        error_log('!!! course $dbrole: ' . $dbug);
+
+        $courseRoles[$rid] = $dbrole->name;
     }
     return $courseRoles;
 }
@@ -27,9 +33,14 @@ function staffenroll_getsystemroles() {
     $dbug = var_export($roles, true);
     error_log('!!! system $roles: ' . $dbug);
 
-    foreach ($roles as $r) {
-        $dbrole = $DB->get_record('role', array('id' => $r));
-        $systemRoles[$r] = $dbrole->name;
+    foreach ($roles as $rclid => $rid) {
+        $dbrole = $DB->get_record('role', array('id' => $rid));
+
+        // DEBUG
+        $dbug = var_export($dbrole, true);
+        error_log('!!! system $dbrole: ' . $dbug);
+
+        $systemRoles[$rid] = $dbrole->name;
     }
     return $systemRoles;
 }
