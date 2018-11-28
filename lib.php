@@ -7,18 +7,9 @@ function staffenroll_getcourseroles() {
     $courseRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_COURSE);
 
-    // DEBUG
-    $dbug = var_export($roles, true);
-    error_log('!!! course $roles: ' . $dbug);
-
     // $rclid Role Context Level ID
     foreach ($roles as $rclid => $rid) {
         $dbrole = $DB->get_record('role', array('id' => $rid));
-
-        // DEBUG
-        $dbug = var_export($dbrole, true);
-        error_log('!!! course $dbrole: ' . $dbug);
-
         $courseRoles[$rid] = $dbrole->name;
     }
     return $courseRoles;
@@ -28,18 +19,8 @@ function staffenroll_getsystemroles() {
     global $DB;
     $systemRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
-
-    // DEBUG
-    $dbug = var_export($roles, true);
-    error_log('!!! system $roles: ' . $dbug);
-
     foreach ($roles as $rclid => $rid) {
         $dbrole = $DB->get_record('role', array('id' => $rid));
-
-        // DEBUG
-        $dbug = var_export($dbrole, true);
-        error_log('!!! system $dbrole: ' . $dbug);
-
         $systemRoles[$rid] = $dbrole->name;
     }
     return $systemRoles;
@@ -68,18 +49,14 @@ function staffenroll_canenroll($courseid) {
 function staffenroll_getenrollments() {
     global $USER, $DB;
     $courseroles = staffenroll_getcourseroles();
-
-    // get a list of roleids
-    $roleids = array_map(
-        function($e) { return $e['roleid']; },
-        $courseroles
-    );
+    // roleids
+    $roleids = array_keys($courseroles);
     $totalroleids = count($roleids);
     $roleidsql = '';
     if($totalroleids == 0) {
-        // FIXME: this is an error
-        // handle it in some way
-        return false;
+        $error = 'no matching roles in db';
+        $sql = 'staffenroll_getcourseroles()';
+        throw new dml_read_exception($error, $sql);
     }
     else if($totalroleids == 1){
         $roleidsql = implode(' ', array(
