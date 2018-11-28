@@ -3,6 +3,7 @@
 // SETTINGS
 
 function staffenroll_getcourseroles() {
+    global $DB;
     $courseRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_COURSE);
 
@@ -18,6 +19,7 @@ function staffenroll_getcourseroles() {
 }
 
 function staffenroll_getsystemroles() {
+    global $DB;
     $systemRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
 
@@ -38,21 +40,16 @@ function staffenroll_getsystemroles() {
 // returns true if the current user can enroll as some type of support staff
 function staffenroll_canenroll($courseid) {
     $context = context_course::instance($courseid);
-    $enroll =  has_capability(
+    $capabilities = array(
         'block/staffenroll:staffenroll',
-        $context
+        'block/studentenroll:studentenroll'
     );
-    if($enroll) {
-        return true;
+    foreach($capabilities as $c) {
+        $enroll =  has_capability($c, $context);
+        if($enroll) {
+            return true;
+        }
     }
-    $enroll =  has_capability(
-        'block/studentenroll:studentenroll',
-        $context
-    );
-    if($enroll) {
-        return true;
-    }
-
     return false;
 }
 
