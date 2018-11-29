@@ -8,7 +8,7 @@ function staffenroll_getcourseroles() {
     $roles = get_roles_for_contextlevels(CONTEXT_COURSE);
 
     // $rclid Role Context Level ID
-    foreach ($roles as $rclid => $rid) {
+    foreach($roles as $rclid => $rid) {
         $dbrole = $DB->get_record('role', array('id' => $rid));
         $courseRoles[$rid] = $dbrole->name;
     }
@@ -19,7 +19,7 @@ function staffenroll_getsystemroles() {
     global $DB;
     $systemRoles = array();
     $roles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
-    foreach ($roles as $rclid => $rid) {
+    foreach($roles as $rclid => $rid) {
         $dbrole = $DB->get_record('role', array('id' => $rid));
         $systemRoles[$rid] = $dbrole->name;
     }
@@ -49,13 +49,13 @@ function staffenroll_canenroll($courseid) {
 function staffenroll_getenrollments() {
     global $USER, $DB;
     $courseroles = staffenroll_getcourseroles();
-    // roleids
     $roleids = array_keys($courseroles);
     $totalroleids = count($roleids);
     $roleidsql = '';
     if($totalroleids == 0) {
         $error = 'no matching roles in db';
         $sql = 'staffenroll_getcourseroles()';
+        error_log($error);
         throw new dml_read_exception($error, $sql);
     }
     else if($totalroleids == 1){
@@ -66,7 +66,7 @@ function staffenroll_getenrollments() {
     }
     else {
         $roleidsql = implode(' ', array(
-            'r.id in (',
+            'r.id in(',
             join(', ', $roleids),
             ')'
         ));
@@ -90,36 +90,170 @@ function staffenroll_getenrollments() {
     return $enrollments;
 }
 
-function populateEnrollLink($ct = array(), $courseid = 0) {
-    if(! staffenroll_canenroll($courseid)) {
-        $ct[] = 'no permission to enroll';
-        return;
-    }
 
-    $url = new moodle_url(
-        '/local/support_staff_enroll/courses_view.php'
+
+// BROWSECOURSES
+
+function staffenroll_getsubcategories($parentid) {
+    global $DB;
+
+    /*
+     * FIXME: delete this once we know new SQL works
+     $query = "select id,name,description from mdl_course_categories "
+     . "where parent = ? "
+     . "order by sortorder";
+
+    $results = $DB->get_records_sql( $query, array($parentid) );
+     */
+
+    $results = $DB->get_records(
+        'course_categories',
+        array('parent' => $parentid),
+        'sortorder',
+        'id, name, description'
     );
-    $link_text = get_string(
-        'allcourseslink',
-        'block_staffenroll'
-    );
-    $ct[] = html_writer::link($url, $link_text);
 
-    // get existing support staff course enrollments
-    $enrollments = staffenroll_getenrollments();
-
-    // add links to courses the user is currently enrolled as support staff
-    foreach($enrollments as $e) {
-        $url = new moodle_url(
-            '/course/view.php',
-            array('id' => $e->courseid)
+    $categories = array();
+    foreach($results as $r) {
+        $categories[] = array(
+            'id'    => $r->id,
+            'name'  => $r->name,
+            'description' => $r->description
         );
-        $course_label = $e->course_shortname or $e->courseid;
-        $link_text = implode(' ', array(
-            $course_label,
-            '(' . $e->role_name . ')'
-        ));
-        $ct[] = html_writer::link($url, $link_text);
     }
-    return $ct;
+    return $categories;
+}
+
+
+function staffenroll_getuserenrollments($userid) {
+    global $DB;
+
+    $query = implode(" ", array(
+        "SELECT ra.id, c.id AS courseid, r.name",
+        "FROM mdl_role_assignments ra, mdl_role r,",
+        "mdl_course c, mdl_context cx",
+        "WHERE ra.userid = ? AND ra.roleid = r.id",
+        "AND ra.contextid = cx.id",
+        "AND cx.instanceid = c.id AND cx.contextlevel = ?"
+    ));
+
+    $results = $DB->get_records_sql( 
+        $query,
+        array($userid, CONTEXT_COURSE)
+    );
+
+    $enrollments = array();
+    foreach($results as $r) {
+        if(isset($enrollments[$r->courseid])) {
+            $enrollments[$r->courseid][] =
+                array('role' => $r->name);
+        } 
+        else {
+            $enrollments[$r->courseid] = array();
+            $enrollments[$r->courseid][] = 
+                array('role' => $r->name);
+        }
+    }
+    return $enrollments;
+}
+
+/*
+ * FIXME: i don't think this is needed at all
+function staffenroll_getpermissions($env) {
+    global $capabilities;
+
+    $context = context_system::instance();
+
+    $permissions = array();
+    foreach($capabilities as $type => $capability) {
+        $permissions[ 'can_' . $type ]
+            = support_staff_enroll_can_enroll_as($type, $env);
+    }
+
+    return $permissions;
+}
+ */
+
+
+//$courses = staffenroll_getcourses($parentid, $USER->id, $env);
+function staffenroll_getcourses($pid, $userid, $env) {
+    global $DB;
+    $dbCourses = $DB->get_records(
+        'course', 
+        array('category' => $pid),
+        'sortorder'
+    );
+/*
+    if(! $courses ) {
+        return array();
+    }
+ */
+    $enrollments = staffenroll_getuserenrollments($userid);
+
+    $courses = array();
+    foreach($dbCourses as $c) {
+        $ok = staffenroll_canenroll($c->id);
+        if($c->id == 1 or ! $ok) {
+            // homepage not course
+            continue;
+        }
+
+        $roles = NULL;
+        if(isset($enrollments[$c->id])) {
+            $roles = $enrollments[$c->id];
+        }
+
+        // array_push( $output, array_merge($data, $permissions) );
+        $courses[] = array(
+            'id'        => $c->id,
+            'idnumber'  => $c->idnumber,
+            'shortname' => $c->shortname,
+            'summary'   => $c->summary,
+            //'teachers'  => support_staff_enroll_get_instructors($course->id),
+            'roles'     => $roles,
+        );
+    }
+    return $courses;
+}
+
+
+function staffenroll_getbreadcrumbs($categoryid) {
+    global $DB;
+
+    $breadcrumbs = array();
+    $linktext = get_string('breadcrumblinktext', 'staffenroll');
+    $breadcrumbs[] = array(
+        'name' => $link_text,
+        'href' => 'browsecourses.php',
+    );
+
+    $category = $DB->get_record(
+        'course_categories',
+        array('id' => $categoryid)
+    );
+
+    // FIXME: this should be an exception
+    if(! $category) {
+        error_log('ERR: no categories returned from id: ' . $categoryid);
+        return $breadcrumbs;
+    }
+
+    $categoryids = explode("/", $category->path);
+    foreach($categoryids as $id) {
+        $results = $DB->get_record('course_categories', array('id' => $id));
+        if(! $results) {
+            // FIXME: throw exception
+            error_log('missing category for id: ' . $id);
+        }
+        $href = new moodle_url(
+            '/blocks/staffenroll/browsecourses.php',
+            array('parent' => $results->id)
+        );
+
+        $breadcrumbs[] = array(
+            'name' => $results->name,
+            'href' => $href,
+        );
+    }
+    return $breadcrumbs;
 }

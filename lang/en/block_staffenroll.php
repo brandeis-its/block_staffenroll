@@ -2,6 +2,7 @@
 $string['pluginname'] = 'Staff enrollments';
 $string['staffenroll'] = 'Staff Enroll';
 $string['allcourseslink'] = 'All courses';
+$string['breadcrumblinktext'] = 'Staff enroll';
 // SETTINGS
 $string['staffenroll:studentenroll'] = 'Allows for student to be temporarily enrolled';
 $string['staffenroll:staffenroll'] = 'Allows for staff to be temporarily enrolled';
