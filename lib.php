@@ -28,26 +28,33 @@ function staffenroll_getsystemroles() {
 
 function staffenroll_getcurrentcategories() {
     global $DB;
+    // processing depends on path order of categories
     $results = $DB->get_records(
         'course_categories',
         array('visible' => 1),
         'path',
-        'id,name,path'
+        'id,name,depth'
     );
     $cc = array();
-    $currentpath = NULL;
-    $currentname = '';
+    $currentdepth = 0;
+    $nameprefix = '';
+    $prevname = NULL;
     foreach($results as $r) {
         $processedname = html_entity_decode($r->name);
-        $extends = strpos($r->path, $currentpath);
-        if($extends === false) {
-            $currentname = $processedname;
+        if($r->depth == 1) {
+            $nameprefix = '';
         }
-        else {
-            $currentname .= ":$processedname";
+        elseif($r->depth > $currentdepth) {
+            $nameprefix .= $prevname . ':';
         }
-        $cc[$r->id] = $currentname;
-        $currentpath = $r->path;
+        elseif($r->depth < $currentdepth) {
+            $pattern = '/' . $prevname . ':$/';
+            $string = $nameprefix;
+            $nameprefix = preg_replace($pattern, '', $string);
+        }
+        $cc[$r->id] = $nameprefix . $processedname;
+        $currentdepth = $r->depth;
+        $prevname = $processedname;
     }
     return $cc;
 }
