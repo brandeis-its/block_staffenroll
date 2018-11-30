@@ -100,3 +100,48 @@ $settings->add(
         '0.0.0.0/0'
     )
 );
+
+// FIXME: this is just to see if nested categories work
+// in the manner that i expect them to
+$currentCategories = array(
+    'special courses' => array(
+        'special 1' => 'sp1',
+        'special 2' => 'sp2',
+        'special 3' => 'sp3'
+    ),
+    'fall 2018' => array(
+        'college of arts &amp; sciences' => array(
+            'african studies' => array(
+                'african studies 1' => 'as1',
+                'african studies 2' => 'as2',
+                'african studies 3' => 'as3'
+            ),
+            'yiddish' => array(
+                'yiddish curses' => 'y1',
+                'yiddish blessings' => 'y2'
+            )
+        ),
+        'international business school' => array(
+            'management' => array(
+                'management 1' => 'mn1',
+                'management 2' => 'mn2',
+                'white collar crime' => 'mn3'
+            ),
+            'marketing' => array(
+                'bullshitting' => 'mk1',
+                'bilking the client' => 'mk2',
+                'stalling' => 'mk3'
+            )
+        )
+    )
+);
+
+$settings->add(
+    new admin_setting_configmultiselect(
+        'block_staffenroll/prohibitedcategories',
+        get_string('prohibitedcategorieslabel', 'block_staffenroll'),
+        get_string('prohibitedcategoriesdesc', 'block_staffenroll'),
+        NULL,
+        $currentCategories
+    )
+);

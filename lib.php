@@ -30,6 +30,8 @@ function staffenroll_getsystemroles() {
 // BLOCK
 
 // returns true if the current user can enroll as some type of support staff
+// FIXME: this should return one of three values
+// student, staff, none
 function staffenroll_canenroll($courseid) {
     $context = context_course::instance($courseid);
     $capabilities = array(
@@ -137,7 +139,7 @@ function staffenroll_getuserenrollments($userid) {
         "AND cx.instanceid = c.id AND cx.contextlevel = ?"
     ));
 
-    $results = $DB->get_records_sql( 
+    $results = $DB->get_records_sql(
         $query,
         array($userid, CONTEXT_COURSE)
     );
@@ -147,10 +149,10 @@ function staffenroll_getuserenrollments($userid) {
         if(isset($enrollments[$r->courseid])) {
             $enrollments[$r->courseid][] =
                 array('role' => $r->name);
-        } 
+        }
         else {
             $enrollments[$r->courseid] = array();
-            $enrollments[$r->courseid][] = 
+            $enrollments[$r->courseid][] =
                 array('role' => $r->name);
         }
     }
@@ -179,7 +181,7 @@ function staffenroll_getpermissions($env) {
 function staffenroll_getcourses($pid, $userid, $env) {
     global $DB;
     $dbCourses = $DB->get_records(
-        'course', 
+        'course',
         array('category' => $pid),
         'sortorder'
     );
