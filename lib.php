@@ -26,6 +26,31 @@ function staffenroll_getsystemroles() {
     return $systemRoles;
 }
 
+function staffenroll_getcurrentcategories() {
+    global $DB;
+    $results = $DB->get_records(
+        'course_categories',
+        array('visible' => 1),
+        'path',
+        'id,name,path'
+    );
+    $cc = array();
+    $currentpath = '';
+    $currentname = '';
+    foreach($results as $r) {
+        $extends = strpos($currentpath, $r->path);
+        if($extends === false) {
+            $currentname = $r->name;
+        }
+        else {
+            $currentname .= ":$r->name";
+        }
+        $cc[$r->id] = $currentname;
+        $currentpath = $r->path;
+    }
+    return $cc;
+}
+
 
 // BLOCK
 
