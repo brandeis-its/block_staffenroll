@@ -35,15 +35,16 @@ function staffenroll_getcurrentcategories() {
         'id,name,path'
     );
     $cc = array();
-    $currentpath = '';
+    $currentpath = NULL;
     $currentname = '';
     foreach($results as $r) {
-        $extends = strpos($currentpath, $r->path);
+        $processedname = html_entity_decode($r->name);
+        $extends = strpos($r->path, $currentpath);
         if($extends === false) {
-            $currentname = $r->name;
+            $currentname = $processedname;
         }
         else {
-            $currentname .= ":$r->name";
+            $currentname .= ":$processedname";
         }
         $cc[$r->id] = $currentname;
         $currentpath = $r->path;

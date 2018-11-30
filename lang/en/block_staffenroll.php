@@ -25,4 +25,4 @@ $string['additionaldesc'] = 'Configure additional behavior[s] for the block';
 $string['allowednetworklabel'] = 'Allowed network';
 $string['allowednetworkdesc'] = 'Enter a network/CIDR combination to limit access (default allows all)';
 $string['prohibitedcategorieslabel'] = 'Prohibited Categories';
-$string['prohibitedcategoriesdesc'] = 'Select categories where staffenroll functionality is NOT available';
+$string['prohibitedcategoriesdesc'] = 'Select categories where staffenroll functionality will NOT be available';

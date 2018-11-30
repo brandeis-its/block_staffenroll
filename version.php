@@ -1,5 +1,5 @@
 <?php
-$plugin->version = 2018113001;
+$plugin->version = 2018113002;
 
 // moodle 3.5
 $plugin->requires = 2018051700;
