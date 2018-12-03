@@ -28,13 +28,6 @@ function staffenroll_getsystemroles() {
 
 function staffenroll_getcurrentcategories() {
     global $DB;
-    // processing depends on path order of categories
-    $results = $DB->get_records(
-        'course_categories',
-        array('visible' => 1),
-        'path',
-        'id,name,depth,path'
-    );
     $cc = array();
     $categoryidname = cache::make('block_staffenroll', 'categoryidname');
     $generated = $categoryidname->get('generated');
@@ -42,10 +35,9 @@ function staffenroll_getcurrentcategories() {
         $generated = 0;
     }
     $now = time();
-    $categoryidnamedays = get_config('block_staffenroll', 'categoryidnamedays');
+    $categoryidnameexpiration = get_config('block_staffenroll', 'categoryidnameexpiration');
     $secondsdiff = $now - $generated;
-    $daysdiff = $secondsdiff / (60 * 60 * 24);
-    if($daysdiff < $categoryidnamedays) {
+    if($secondsdiff < $categoryidnameexpiration) {
         // do math to see if it's longer than default
         $cc = $categoryidname->get('currentcategories');
         if($cc != false) {
@@ -53,6 +45,13 @@ function staffenroll_getcurrentcategories() {
         }
     }
 
+    // processing depends on path order of categories
+    $results = $DB->get_records(
+        'course_categories',
+        array('visible' => 1),
+        'path',
+        'id,name,depth,path'
+    );
     // maps ids to names so that paths can be "decoded"
     $displayname = NULL;
     foreach($results as $r) {

@@ -27,5 +27,5 @@ $string['allowednetworklabel'] = 'Allowed network';
 $string['allowednetworkdesc'] = 'Enter a network/CIDR combination to limit access (default allows all)';
 $string['prohibitedcategorieslabel'] = 'Prohibited Categories';
 $string['prohibitedcategoriesdesc'] = 'Select categories where staffenroll functionality will NOT be available';
-$string['categorycachedayslabel'] = 'Category cache days';
-$string['categorycachedaysdesc'] = 'Number of days category cache remains valid';
+$string['categoryidnameexpirationlabel'] = 'Category cache expiration';
+$string['categoryidnameexpirationdesc'] = 'Number of seconds category cache remains valid (default 90 days)';

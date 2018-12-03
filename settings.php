@@ -118,9 +118,9 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configduration(
-        'block_staffenroll/categoryidnamedays',
-        get_string('categoryidnamedayslabel', 'block_staffenroll'),
-        get_string('categoryidnamedaysdesc', 'block_staffenroll'),
-        90
+        'block_staffenroll/categoryidnameexpiration',
+        get_string('categoryidnameexpirationlabel', 'block_staffenroll'),
+        get_string('categoryidnameexpirationdesc', 'block_staffenroll'),
+        7776000
     )
 );
