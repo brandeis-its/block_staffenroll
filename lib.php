@@ -33,28 +33,39 @@ function staffenroll_getcurrentcategories() {
         'course_categories',
         array('visible' => 1),
         'path',
-        'id,name,depth'
+        'id,name,depth,path'
     );
     $cc = array();
-    $currentdepth = 0;
-    $nameprefix = '';
-    $prevname = NULL;
+    // maps ids to names so that paths can be "decoded"
+    $cat_idname = array();
+    $nameprefix = NULL;
     foreach($results as $r) {
         $processedname = html_entity_decode($r->name);
         if($r->depth == 1) {
             $nameprefix = '';
+            if(! isset($cat_idname[$r->id])) {
+                $cat_idname[$r->id] = $processedname;
+            }
         }
-        elseif($r->depth > $currentdepth) {
-            $nameprefix .= $prevname . ':';
-        }
-        elseif($r->depth < $currentdepth) {
-            $pattern = '/' . $prevname . ':$/';
-            $string = $nameprefix;
-            $nameprefix = preg_replace($pattern, '', $string);
+        else {
+            if(! isset($cat_idname[$r->id])) {
+                $cat_idname[$r->id] = $processedname;
+            }
+            $path = explode("/", $r->path);
+            // remove last element ($processedname)
+            array_pop($path);
+            $catnames = array();
+            foreach($path as $p) {
+                if(isset($cat_idname[$p])) {
+                    $catnames[] = $cat_idname[$p];
+                }
+                else {
+                    $catnames[] = 'cat' . $p;
+                }
+            }
+            $nameprefix = implode(':', $catnames);
         }
         $cc[$r->id] = $nameprefix . $processedname;
-        $currentdepth = $r->depth;
-        $prevname = $processedname;
     }
     return $cc;
 }

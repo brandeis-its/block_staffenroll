@@ -103,8 +103,6 @@ $settings->add(
 
 
 
-// FIXME: this is just to see if nested categories work
-// in the manner that i expect them to
 $currentCategories = staffenroll_getcurrentcategories();
 
 $settings->add(
