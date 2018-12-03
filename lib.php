@@ -71,7 +71,8 @@ function staffenroll_getcurrentcategories() {
         }
         else {
             $path = explode("/", $r->path);
-            // remove last element ($processedname)
+            // remove empty first element
+            array_shift($path);
             $catnames = array();
             foreach($path as $p) {
                 $cachename = $categoryidname->get($p);
