@@ -41,7 +41,7 @@ class block_staffenroll extends block_base {
         $ct[] = html_writer::link($url, $link_text);
 
         // get existing support staff course enrollments
-        $enrollments = staffenroll_getenrollments();
+        $enrollments = staffenroll_getuserenrollments();
 
         // add links to courses the user is currently enrolled as support staff
         foreach($enrollments as $e) {

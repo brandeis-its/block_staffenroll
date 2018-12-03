@@ -37,6 +37,14 @@ function staffenroll_getcurrentcategories() {
     $now = time();
     $categoryidnameexpiration = get_config('block_staffenroll', 'categoryidnameexpiration');
     $secondsdiff = $now - $generated;
+
+    // DEBUG
+    // FIXME: this is just to verify expiration logic is working as expected
+    error_log('!!! $generated: ' . $generated);
+    error_log('!!! $now: ' . $now);
+    error_log('!!! $secondsdiff: ' . $secondsdiff);
+    error_log('!!! $categoryidnameexpiration: ' . $categoryidnameexpiration);
+
     if($secondsdiff < $categoryidnameexpiration) {
         // do math to see if it's longer than default
         $cc = $categoryidname->get('currentcategories');
@@ -96,7 +104,7 @@ function staffenroll_getcurrentcategories() {
 
 // returns true if the current user can enroll as some type of support staff
 // FIXME: this should return one of three values
-// student, staff, none
+// student, staff, false (none)
 function staffenroll_canenroll($courseid) {
     $context = context_course::instance($courseid);
     $capabilities = array(
@@ -113,7 +121,7 @@ function staffenroll_canenroll($courseid) {
 }
 
 // get existing enrollments for the current user as some kind of support staff
-function staffenroll_getenrollments() {
+function staffenroll_getuserenrollments($userid = false) {
     global $USER, $DB;
     $courseroles = staffenroll_getcourseroles();
     $roleids = array_keys($courseroles);
@@ -139,6 +147,9 @@ function staffenroll_getenrollments() {
         ));
     }
 
+    if($userid === false) {
+        $userid = $USER->id;
+    }
     $query = implode(' ', array(
         "SELECT c.id AS courseid, c.idnumber AS course_idnumber,",
         "c.shortname AS course_shortname, r.name AS role_name,",
@@ -149,7 +160,7 @@ function staffenroll_getenrollments() {
         $roleidsql,
         "AND r.id=ra.roleid",
         "AND ra.userid =",
-        $USER->id,
+        $userid,
         "AND ra.contextid = x.id AND c.id = x.instanceid",
         "ORDER BY c.idnumber"
     ));
@@ -191,8 +202,8 @@ function staffenroll_getsubcategories($parentid) {
     return $categories;
 }
 
-
-function staffenroll_getuserenrollments($userid) {
+/*
+function staffenroll_DEPRECATEDgetuserenrollments($userid) {
     global $DB;
 
     $query = implode(" ", array(
@@ -223,6 +234,7 @@ function staffenroll_getuserenrollments($userid) {
     }
     return $enrollments;
 }
+ */
 
 /*
  * FIXME: i don't think this is needed at all
