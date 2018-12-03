@@ -114,3 +114,13 @@ $settings->add(
         $currentCategories
     )
 );
+
+
+$settings->add(
+    new admin_setting_configduration(
+        'block_staffenroll/categoryidnamedays',
+        get_string('categoryidnamedayslabel', 'block_staffenroll'),
+        get_string('categoryidnamedaysdesc', 'block_staffenroll'),
+        90
+    )
+);

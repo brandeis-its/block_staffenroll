@@ -36,37 +36,58 @@ function staffenroll_getcurrentcategories() {
         'id,name,depth,path'
     );
     $cc = array();
+    $categoryidname = cache::make('block_staffenroll', 'categoryidname');
+    $generated = $categoryidname->get('generated');
+    if($generated === false) {
+        $generated = 0;
+    }
+    $now = time();
+    $categoryidnamedays = get_config('block_staffenroll', 'categoryidnamedays');
+    $secondsdiff = $now - $generated;
+    $daysdiff = $secondsdiff / (60 * 60 * 24);
+    if($daysdiff < $categoryidnamedays) {
+        // do math to see if it's longer than default
+        $cc = $categoryidname->get('currentcategories');
+        if($cc != false) {
+            return $cc;
+        }
+    }
+
     // maps ids to names so that paths can be "decoded"
-    $cat_idname = array();
-    $nameprefix = NULL;
+    $displayname = NULL;
     foreach($results as $r) {
         $processedname = html_entity_decode($r->name);
+        $cachename = $categoryidname->get($r->id);
+        // processing could be sped up
+        // by skipping check against processedname
+        if(
+            $cachename === false
+            or
+            $cachename != $processedname
+        ) {
+            $categoryidname->set($r->id, $processedname);
+        }
         if($r->depth == 1) {
-            $nameprefix = '';
-            if(! isset($cat_idname[$r->id])) {
-                $cat_idname[$r->id] = $processedname;
-            }
+            $displayname = $processedname;
         }
         else {
-            if(! isset($cat_idname[$r->id])) {
-                $cat_idname[$r->id] = $processedname;
-            }
             $path = explode("/", $r->path);
             // remove last element ($processedname)
-            array_pop($path);
             $catnames = array();
             foreach($path as $p) {
-                if(isset($cat_idname[$p])) {
-                    $catnames[] = $cat_idname[$p];
+                $cachename = $categoryidname->get($p);
+                if($cachename === false) {
+                    $cachename = 'catid' . $p;
                 }
-                else {
-                    $catnames[] = 'cat' . $p;
-                }
+                $catnames[] = $cachename;
             }
-            $nameprefix = implode(':', $catnames);
+            $displayname = implode(':', $catnames);
         }
-        $cc[$r->id] = $nameprefix . $processedname;
+        $cc[$r->id] = $displayname;
     }
+    // $categoryidname
+    $categoryidname->set('generated', $now);
+    $categoryidname->set('currentcategories', $cc);
     return $cc;
 }
 
@@ -205,18 +226,18 @@ function staffenroll_getuserenrollments($userid) {
 
 /*
  * FIXME: i don't think this is needed at all
-function staffenroll_getpermissions($env) {
-    global $capabilities;
+ function staffenroll_getpermissions($env) {
+     global $capabilities;
 
-    $context = context_system::instance();
+     $context = context_system::instance();
 
-    $permissions = array();
-    foreach($capabilities as $type => $capability) {
-        $permissions[ 'can_' . $type ]
-            = support_staff_enroll_can_enroll_as($type, $env);
-    }
+     $permissions = array();
+     foreach($capabilities as $type => $capability) {
+         $permissions[ 'can_' . $type ]
+             = support_staff_enroll_can_enroll_as($type, $env);
+     }
 
-    return $permissions;
+     return $permissions;
 }
  */
 

@@ -3,6 +3,7 @@ $string['pluginname'] = 'Staff enrollments';
 $string['staffenroll'] = 'Staff Enroll';
 $string['allcourseslink'] = 'All courses';
 $string['breadcrumblinktext'] = 'Staff enroll';
+$string['cache_categoryidname'] = 'Cached hash associating category id with name';
 // SETTINGS
 $string['staffenroll:studentenroll'] = 'Allows for student to be temporarily enrolled';
 $string['staffenroll:staffenroll'] = 'Allows for staff to be temporarily enrolled';
@@ -26,3 +27,5 @@ $string['allowednetworklabel'] = 'Allowed network';
 $string['allowednetworkdesc'] = 'Enter a network/CIDR combination to limit access (default allows all)';
 $string['prohibitedcategorieslabel'] = 'Prohibited Categories';
 $string['prohibitedcategoriesdesc'] = 'Select categories where staffenroll functionality will NOT be available';
+$string['categorycachedayslabel'] = 'Category cache days';
+$string['categorycachedaysdesc'] = 'Number of days category cache remains valid';
