@@ -5,15 +5,14 @@ require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
 global $DB;
 
-// FIXME: check ip address
-
+$ok = staffenroll_validatenetworkhost();
 
 $parentid = optional_param('parent', '', PARAM_INT);
 $courseid = optional_param('course', '', PARAM_INT);
 
 /*
  * FIXME: handle unenrol somewhere else
- 
+
 // this handles if they are unenrolling
 // unenroll them then redirect to the main page
 $action = isset($_REQUEST['enrl_action']) ? $_REQUEST['enrl_action'] : NULL;
@@ -31,7 +30,7 @@ if (isset($action) && $action == 'unenroll') {
 
 /*
  * FIXME: this might be better handled in another file
- 
+
  // if they chose to enroll, enroll them then redirect to course
 if (isset($_REQUEST['enroll'])) {
     $type = $_REQUEST['enrl_type'];

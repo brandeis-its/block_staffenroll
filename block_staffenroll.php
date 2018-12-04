@@ -25,14 +25,15 @@ class block_staffenroll extends block_base {
 
 
     // validates user, populates link and previous enrollments
-    function populateEnrollLink($ct = array(), $courseid = 0) {
-        if(! staffenroll_canenroll($courseid)) {
+    function populateEnrollLink($ct = array()) {
+       $rolename = staffenroll_canenroll();
+        if($rolename == 'none') {
             $ct[] = 'no permission to enroll';
             return;
         }
 
         $url = new moodle_url(
-            '/blocks/staffenroll/browsecourses.php'
+            '/blocks/staffenroll/browse.php'
         );
         $link_text = get_string(
             'allcourseslink',
@@ -75,7 +76,7 @@ class block_staffenroll extends block_base {
         }
         else if($currentContext->contextlevel == CONTEXT_USER){
             //$contentText[] = 'enroll link';
-            $this->populateEnrollLink($contentText, $USER->id);
+            $this->populateEnrollLink($contentText);
         }
         else {
             $contentText[] = 'cannot place block in this context.';

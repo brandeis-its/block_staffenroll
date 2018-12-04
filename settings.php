@@ -91,9 +91,8 @@ $settings->add(
     )
 );
 
-// FIXME: validate input for this one
 $settings->add(
-    new admin_setting_configtext(
+    new admin_setting_configiplist(
         'block_staffenroll/allowednetwork',
         get_string('allowednetworklabel', 'block_staffenroll'),
         get_string('allowednetworkdesc', 'block_staffenroll'),

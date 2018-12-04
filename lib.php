@@ -105,23 +105,36 @@ function staffenroll_getcurrentcategories() {
 // returns true if the current user can enroll as some type of support staff
 // FIXME: this should return one of three values
 // student, staff, false (none)
-function staffenroll_canenroll($courseid) {
-    $context = context_course::instance($courseid);
-    $capabilities = array(
-        'block/staffenroll:staffenroll',
-        'block/studentenroll:studentenroll'
+function staffenroll_canenroll($courseid = 0) {
+    global $USER;
+    $context = NULL;
+    if($courseid == 0) {
+        $context = context_user::instance($USER->id);
+    }
+    else {
+        $context = context_course::instance($courseid);
+    }
+    $capabilityrole = array(
+        array(
+            'capability' => 'block/staffenroll:staffenroll',
+            'role' => 'staff'
+        ),
+        array(
+            'capability' => 'block/staffenroll:studentenroll',
+            'role' => 'student'
+        )
     );
-    foreach($capabilities as $c) {
-        $enroll =  has_capability($c, $context);
+    foreach($capabilityrole as $cr) {
+        $enroll =  has_capability($cr['capability'], $context);
         if($enroll) {
-            return true;
+            return $cr['role'];
         }
     }
-    return false;
+    return 'none';
 }
 
 // get existing enrollments for the current user as some kind of support staff
-function staffenroll_getuserenrollments($userid = false) {
+function staffenroll_getuserenrollments($userid = 0) {
     global $USER, $DB;
     $courseroles = staffenroll_getcourseroles();
     $roleids = array_keys($courseroles);
@@ -147,7 +160,7 @@ function staffenroll_getuserenrollments($userid = false) {
         ));
     }
 
-    if($userid === false) {
+    if($userid == 0) {
         $userid = $USER->id;
     }
     $query = implode(' ', array(
@@ -171,6 +184,16 @@ function staffenroll_getuserenrollments($userid = false) {
 
 
 // BROWSECOURSES
+
+function staffenroll_validatenetworkhost() {
+    $allowednetwork = get_config('block_staffenroll', 'allowednetwork');
+
+    // FIXME: remove this
+    // just to see what comes back
+    $dbug = var_export($allowednetwork, true);
+    error_log('!!! $allowednetwork: ' . $dbug);
+    return false;
+}
 
 function staffenroll_getsubcategories($parentid) {
     global $DB;
