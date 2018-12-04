@@ -186,12 +186,23 @@ function staffenroll_getuserenrollments($userid = 0) {
 // BROWSECOURSES
 
 function staffenroll_validatenetworkhost() {
+    $hostip = $_SERVER['REMOTE_ADDR'];
+    $ip = ip2long($hostip);
     $allowednetwork = get_config('block_staffenroll', 'allowednetwork');
-
-    // FIXME: remove this
-    // just to see what comes back
-    $dbug = var_export($allowednetwork, true);
-    error_log('!!! $allowednetwork: ' . $dbug);
+    $networks = explode("\n", $allowednetwork);
+    foreach($networks as $n) {
+        //list ($subnet, $bits) = explode('/', $range);
+        list ($subnet, $bits) = explode('/', $n);
+        if ($bits === null) {
+            $bits = 32;
+        }
+        $subnet = ip2long($subnet);
+        $mask = -1 << (32 - $bits);
+        $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
+        if(($ip & $mask) == $subnet) {
+            return true;
+        }
+    }
     return false;
 }
 
