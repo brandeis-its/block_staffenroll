@@ -118,7 +118,7 @@ function staffenroll_getprohibitedcategorieslist() {
     // $coursescategories
     $now = time();
     $coursescategories->set('pclgenerated', $now);
-    $coursescategories->set('prohibitedcategorylist', $pcl);
+    $coursescategories->set('prohibitedcategorieslist', $pcl);
 
     // FIXME: debugging, remove before release
     error_log("!!! returning generated prohibited categories");

@@ -92,7 +92,7 @@ $settings->add(
 
 
 
-$prohibitedCategories = staffenroll_getprohibitedcategorylist();
+$prohibitedCategories = staffenroll_getprohibitedcategorieslist();
 
 $settings->add(
     new admin_setting_configmultiselect(
