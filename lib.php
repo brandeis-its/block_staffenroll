@@ -2,56 +2,75 @@
 
 // SETTINGS
 
-function staffenroll_getcourseroles() {
+function staffenroll_getroles($t = 'course') {
     global $DB;
-    $courseRoles = array();
-    $roles = get_roles_for_contextlevels(CONTEXT_COURSE);
+    $contextRoles = array();
+    if($t == 'course') {
+        $contextRoles = get_roles_for_contextlevels(CONTEXT_COURSE);
+    }
+    elseif($t = 'system') {
+        $contextRoles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
+    }
+    else{
+        error_log('!!! invalid type for staffenroll_getroles: ' . $t);
+        return $contextRoles;
+    }
 
     // $rclid Role Context Level ID
-    foreach($roles as $rclid => $rid) {
+    $roles = array();
+    foreach($contextRoles as $rclid => $rid) {
         $dbrole = $DB->get_record('role', array('id' => $rid));
-        $courseRoles[$rid] = $dbrole->name;
+        $roles[$rid] = $dbrole->name;
     }
-    return $courseRoles;
+    return $roles;
 }
 
-function staffenroll_getsystemroles() {
-    global $DB;
-    $systemRoles = array();
-    $roles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
-    foreach($roles as $rclid => $rid) {
-        $dbrole = $DB->get_record('role', array('id' => $rid));
-        $systemRoles[$rid] = $dbrole->name;
-    }
-    return $systemRoles;
-}
 
-function staffenroll_getcurrentcategories() {
-    global $DB;
-    $cc = array();
-    $categoryidname = cache::make('block_staffenroll', 'categoryidname');
-    $generated = $categoryidname->get('generated');
-    if($generated === false) {
-        $generated = 0;
+// time stamp key
+function staffenroll_unexpiredcache($tsk) {
+    $coursescategories = cache::make('block_staffenroll', 'coursescategories');
+    $timestamp = $coursescategories->get($tsk);
+    if($timestamp === false) {
+        error_log('!!! invalid timestamp key: ' . $tsk);
+        return false;
     }
     $now = time();
-    $categoryidnameexpiration = get_config('block_staffenroll', 'categoryidnameexpiration');
-    $secondsdiff = $now - $generated;
+    $coursescategoriesexpiration = get_config('block_staffenroll', 'coursescategoriesexpiration');
+    $secondsdiff = $now - $timestamp;
 
-    // DEBUG
     // FIXME: this is just to verify expiration logic is working as expected
-    error_log('!!! $generated: ' . $generated);
-    error_log('!!! $now: ' . $now);
-    error_log('!!! $secondsdiff: ' . $secondsdiff);
-    error_log('!!! $categoryidnameexpiration: ' . $categoryidnameexpiration);
+    // remove before release
+    $error = array(
+        '!!!  $timestamp: ' . $timestamp,
+        '$now: ' . $now,
+        '$secondsdiff: ' . $secondsdiff,
+        '$coursescategoriesexpiration: ' . $coursescategoriesexpiration
+    );
+    $msg = implode(', ', $error);
+    error_log($msg);
 
-    if($secondsdiff < $categoryidnameexpiration) {
-        // do math to see if it's longer than default
-        $cc = $categoryidname->get('currentcategories');
-        if($cc != false) {
-            return $cc;
+    if($secondsdiff < $coursescategoriesexpiration) {
+        return true;
+    }
+    return false;
+}
+
+function staffenroll_getprohibitedcategorieslist() {
+    global $DB;
+
+    $ok = staffenroll_unexpiredcache('pclgenerated');
+    if($ok) {
+        $coursescategories = cache::make('block_staffenroll', 'coursescategories');
+        $pcl = $coursescategories->get('prohibitedcategorieslist');
+        if($pcl) {
+
+            // FIXME: debugging, remove before release
+            error_log("!!! returning cached prohibited categories");
+
+            return $pcl;
         }
     }
+    $pcl = array();
 
     // processing depends on path order of categories
     $results = $DB->get_records(
@@ -60,11 +79,13 @@ function staffenroll_getcurrentcategories() {
         'path',
         'id,name,depth,path'
     );
+
     // maps ids to names so that paths can be "decoded"
     $displayname = NULL;
     foreach($results as $r) {
         $processedname = html_entity_decode($r->name);
-        $cachename = $categoryidname->get($r->id);
+        $idx = 'cat' . $r->id;
+        $cachename = $coursescategories->get($idx);
         // processing could be sped up
         // by skipping check against processedname
         if(
@@ -72,7 +93,7 @@ function staffenroll_getcurrentcategories() {
             or
             $cachename != $processedname
         ) {
-            $categoryidname->set($r->id, $processedname);
+            $coursescategories->set($idx, $processedname);
         }
         if($r->depth == 1) {
             $displayname = $processedname;
@@ -82,21 +103,27 @@ function staffenroll_getcurrentcategories() {
             // remove empty first element
             array_shift($path);
             $catnames = array();
-            foreach($path as $p) {
-                $cachename = $categoryidname->get($p);
+            foreach($path as $catid) {
+                $pidx = 'cat' . $catid;
+                $cachename = $coursescategories->get($pidx);
                 if($cachename === false) {
-                    $cachename = 'catid' . $p;
+                    $cachename = $pidx;
                 }
                 $catnames[] = $cachename;
             }
             $displayname = implode(':', $catnames);
         }
-        $cc[$r->id] = $displayname;
+        $pcl[$idx] = $displayname;
     }
-    // $categoryidname
-    $categoryidname->set('generated', $now);
-    $categoryidname->set('currentcategories', $cc);
-    return $cc;
+    // $coursescategories
+    $now = time();
+    $coursescategories->set('pclgenerated', $now);
+    $coursescategories->set('prohibitedcategorylist', $pcl);
+
+    // FIXME: debugging, remove before release
+    error_log("!!! returning generated prohibited categories");
+
+    return $pcl;
 }
 
 
@@ -108,6 +135,7 @@ function staffenroll_getcurrentcategories() {
 function staffenroll_canenroll($courseid = 0) {
     global $USER;
     $context = NULL;
+    // no courseid means user context
     if($courseid == 0) {
         $context = context_user::instance($USER->id);
     }
@@ -135,7 +163,7 @@ function staffenroll_canenroll($courseid = 0) {
 
 // get existing enrollments for the current user as some kind of support staff
 function staffenroll_getuserenrollments($userid = 0) {
-    global $USER, $DB;
+    global $DB, $USER;
     $courseroles = staffenroll_getcourseroles();
     $roleids = array_keys($courseroles);
     $totalroleids = count($roleids);
@@ -164,8 +192,8 @@ function staffenroll_getuserenrollments($userid = 0) {
         $userid = $USER->id;
     }
     $query = implode(' ', array(
-        "SELECT c.id AS courseid, c.idnumber AS course_idnumber,",
-        "c.shortname AS course_shortname, r.name AS role_name,",
+        "SELECT c.id AS courseid, c.idnumber,",
+        "c.shortname, r.name AS rolename,",
         "r.id AS roleid",
         "FROM mdl_role r, mdl_role_assignments ra,",
         " mdl_context x, mdl_course c",
@@ -177,7 +205,16 @@ function staffenroll_getuserenrollments($userid = 0) {
         "AND ra.contextid = x.id AND c.id = x.instanceid",
         "ORDER BY c.idnumber"
     ));
-    $enrollments = $DB->get_records_sql($query);
+    $enrollments = array();
+    $records = $DB->get_records_sql($query);
+    foreach($records as $r) {
+        $enrollments[$r->courseid] = array(
+            'idnumber' => $r->idnumber,
+            'shortname' => $r->shortname,
+            'rolename' => $r->rolename,
+            'roleid' => $r->roleid
+        );
+    }
     return $enrollments;
 }
 
@@ -185,11 +222,13 @@ function staffenroll_getuserenrollments($userid = 0) {
 
 // BROWSECOURSES
 
+// based on
+// https://stackoverflow.com/questions/594112/matching-an-ip-to-a-cidr-mask-in-php-5
 function staffenroll_validatenetworkhost() {
     $hostip = $_SERVER['REMOTE_ADDR'];
     $ip = ip2long($hostip);
-    $allowednetwork = get_config('block_staffenroll', 'allowednetwork');
-    $networks = explode("\n", $allowednetwork);
+    $allowednetworks = get_config('block_staffenroll', 'allowednetworks');
+    $networks = explode("\n", $allowednetworks);
     foreach($networks as $n) {
         //list ($subnet, $bits) = explode('/', $range);
         list ($subnet, $bits) = explode('/', $n);
@@ -206,107 +245,76 @@ function staffenroll_validatenetworkhost() {
     return false;
 }
 
-function staffenroll_getsubcategories($parentid) {
+function staffenroll_getsubcategories($pid) {
     global $DB;
 
-    /*
-     * FIXME: delete this once we know new SQL works
-     $query = "select id,name,description from mdl_course_categories "
-     . "where parent = ? "
-     . "order by sortorder";
-
-    $results = $DB->get_records_sql( $query, array($parentid) );
-     */
+    $coursescategories = cache::make('block_staffenroll', 'coursescategories');
+    $cachekey = 'pcat' . $pid;
+    $cachetimestamp = $cachekey . 'generated';
+    $ok = staffenroll_unexpiredcache($cachetimestamp);
+    if($ok) {
+        $subcats = $coursescategories->get($cachekey);
+        if($subcats) {
+            return $subcats;
+        }
+    }
 
     $results = $DB->get_records(
         'course_categories',
-        array('parent' => $parentid),
+        array('parent' => $pid),
         'sortorder',
         'id, name, description'
     );
 
-    $categories = array();
+    $subcats = array();
     foreach($results as $r) {
-        $categories[] = array(
+        $subcats[] = array(
             'id'    => $r->id,
             'name'  => $r->name,
             'description' => $r->description
         );
     }
-    return $categories;
+    $now = time();
+    $coursescategories->set($cachetimestamp, $now);
+    $coursescategories->set($cachekey, $subcats);
+    return $subcats;
 }
 
-/*
-function staffenroll_DEPRECATEDgetuserenrollments($userid) {
-    global $DB;
+function staffenroll_getsubcourses($pid) {
+    global $DB, $USER;
 
-    $query = implode(" ", array(
-        "SELECT ra.id, c.id AS courseid, r.name",
-        "FROM mdl_role_assignments ra, mdl_role r,",
-        "mdl_course c, mdl_context cx",
-        "WHERE ra.userid = ? AND ra.roleid = r.id",
-        "AND ra.contextid = cx.id",
-        "AND cx.instanceid = c.id AND cx.contextlevel = ?"
-    ));
-
-    $results = $DB->get_records_sql(
-        $query,
-        array($userid, CONTEXT_COURSE)
-    );
-
-    $enrollments = array();
-    foreach($results as $r) {
-        if(isset($enrollments[$r->courseid])) {
-            $enrollments[$r->courseid][] =
-                array('role' => $r->name);
-        }
-        else {
-            $enrollments[$r->courseid] = array();
-            $enrollments[$r->courseid][] =
-                array('role' => $r->name);
-        }
+    $coursescategories = cache::make('block_staffenroll', 'coursescategories');
+    $cachekey = 'pcrs' . $pid;
+    $cachetimestamp = $cachekey . 'generated';
+    $ok = staffenroll_unexpiredcache($cachetimestamp);
+    $subcrs = array();
+    if($ok) {
+        $subcrs = $coursescategories->get($cachekey);
     }
-    return $enrollments;
-}
- */
-
-/*
- * FIXME: i don't think this is needed at all
- function staffenroll_getpermissions($env) {
-     global $capabilities;
-
-     $context = context_system::instance();
-
-     $permissions = array();
-     foreach($capabilities as $type => $capability) {
-         $permissions[ 'can_' . $type ]
-             = support_staff_enroll_can_enroll_as($type, $env);
-     }
-
-     return $permissions;
-}
- */
-
-
-//$courses = staffenroll_getcourses($parentid, $USER->id, $env);
-function staffenroll_getcourses($pid, $userid, $env) {
-    global $DB;
-    $dbCourses = $DB->get_records(
-        'course',
-        array('category' => $pid),
-        'sortorder'
-    );
-/*
-    if(! $courses ) {
-        return array();
+    else {
+        $records = $DB->get_records(
+            'course',
+            array('category' => $pid),
+            'sortorder'
+        );
+        foreach($records as $r) {
+            $subcrs[] = array(
+                'id' => $r->id,
+                'idnumber' => $r->idnumber,
+                'shortname' => $r->shortname,
+                'summary' => $r->summary
+            );
+        }
+        $now = time();
+        $coursecategories->set($cachetimestamp, $now);
+        $coursecategories->set($cachekey, $subcrs);
     }
- */
-    $enrollments = staffenroll_getuserenrollments($userid);
 
+    $enrollments = staffenroll_getuserenrollments($USER->id);
     $courses = array();
-    foreach($dbCourses as $c) {
+    foreach($subcrs as $c) {
         $ok = staffenroll_canenroll($c->id);
-        if($c->id == 1 or ! $ok) {
+        if(! $ok or $c->id == 1) {
             // homepage not course
             continue;
         }
@@ -315,16 +323,8 @@ function staffenroll_getcourses($pid, $userid, $env) {
         if(isset($enrollments[$c->id])) {
             $roles = $enrollments[$c->id];
         }
-
-        // array_push( $output, array_merge($data, $permissions) );
-        $courses[] = array(
-            'id'        => $c->id,
-            'idnumber'  => $c->idnumber,
-            'shortname' => $c->shortname,
-            'summary'   => $c->summary,
-            //'teachers'  => support_staff_enroll_get_instructors($course->id),
-            'roles'     => $roles,
-        );
+        $c['roles'] = $roles;
+        $courses[] = $c;
     }
     return $courses;
 }

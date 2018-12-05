@@ -3,18 +3,8 @@ defined('MOODLE_INTERNAL') || die;
 
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
-/*
-// FIXME: is this needed?
-if (! $hassiteconfig) {
-    error_log('!! $hassiteconfig false');
-    // FIXME: should do somethingelse on error
-    $dashboardurl = new moodle_url('/my');
-    redirect($dashboard);
-}
- */
-
-$courseRoles = staffenroll_getcourseroles();
-$systemRoles = staffenroll_getsystemroles();
+$courseRoles = staffenroll_getroles();
+$systemRoles = staffenroll_getroles('system');
 
 
 // ENABLE
@@ -93,16 +83,16 @@ $settings->add(
 
 $settings->add(
     new admin_setting_configiplist(
-        'block_staffenroll/allowednetwork',
-        get_string('allowednetworklabel', 'block_staffenroll'),
-        get_string('allowednetworkdesc', 'block_staffenroll'),
+        'block_staffenroll/allowednetworks',
+        get_string('allowednetworkslabel', 'block_staffenroll'),
+        get_string('allowednetworksdesc', 'block_staffenroll'),
         '0.0.0.0/0'
     )
 );
 
 
 
-$currentCategories = staffenroll_getcurrentcategories();
+$prohibitedCategories = staffenroll_getprohibitedcategorylist();
 
 $settings->add(
     new admin_setting_configmultiselect(
@@ -110,16 +100,16 @@ $settings->add(
         get_string('prohibitedcategorieslabel', 'block_staffenroll'),
         get_string('prohibitedcategoriesdesc', 'block_staffenroll'),
         NULL,
-        $currentCategories
+        $prohibitedCategories
     )
 );
 
 
 $settings->add(
     new admin_setting_configduration(
-        'block_staffenroll/categoryidnameexpiration',
-        get_string('categoryidnameexpirationlabel', 'block_staffenroll'),
-        get_string('categoryidnameexpirationdesc', 'block_staffenroll'),
+        'block_staffenroll/cacheexpiration',
+        get_string('cacheexpirationlabel', 'block_staffenroll'),
+        get_string('cacheexpirationdesc', 'block_staffenroll'),
         7776000
     )
 );
