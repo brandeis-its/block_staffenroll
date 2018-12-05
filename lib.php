@@ -58,10 +58,12 @@ function staffenroll_unexpiredcache($tsk) {
 function staffenroll_getprohibitedcategorieslist() {
     global $DB;
 
-    $ok = staffenroll_unexpiredcache('pclgenerated');
+    $coursescategories = cache::make('block_staffenroll', 'coursescategories');
+    $cachekey = 'prohibitedcategorieslist';
+    $cachetimestamp = 'pclgenerated';
+    $ok = staffenroll_unexpiredcache($cachetimestamp);
     if($ok) {
-        $coursescategories = cache::make('block_staffenroll', 'coursescategories');
-        $pcl = $coursescategories->get('prohibitedcategorieslist');
+        $pcl = $coursescategories->get($cachekey);
         if($pcl) {
 
             // FIXME: debugging, remove before release
@@ -95,6 +97,7 @@ function staffenroll_getprohibitedcategorieslist() {
         ) {
             $coursescategories->set($idx, $processedname);
         }
+
         if($r->depth == 1) {
             $displayname = $processedname;
         }
@@ -115,10 +118,9 @@ function staffenroll_getprohibitedcategorieslist() {
         }
         $pcl[$idx] = $displayname;
     }
-    // $coursescategories
     $now = time();
-    $coursescategories->set('pclgenerated', $now);
-    $coursescategories->set('prohibitedcategorieslist', $pcl);
+    $coursescategories->set($cachetimestamp, $now);
+    $coursescategories->set($cachekey, $pcl);
 
     // FIXME: debugging, remove before release
     error_log("!!! returning generated prohibited categories");
