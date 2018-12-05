@@ -166,13 +166,13 @@ function staffenroll_canenroll($courseid = 0) {
 // get existing enrollments for the current user as some kind of support staff
 function staffenroll_getuserenrollments($userid = 0) {
     global $DB, $USER;
-    $courseroles = staffenroll_getcourseroles();
+    $courseroles = staffenroll_getroles();
     $roleids = array_keys($courseroles);
     $totalroleids = count($roleids);
     $roleidsql = '';
     if($totalroleids == 0) {
         $error = 'no matching roles in db';
-        $sql = 'staffenroll_getcourseroles()';
+        $sql = 'staffenroll_getroles()';
         error_log($error);
         throw new dml_read_exception($error, $sql);
     }
