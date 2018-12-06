@@ -2,6 +2,7 @@
 
 require_once($CFG->dirroot . '/config.php');
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
+require_once($CFG->dirroot . '/blocks/staffenroll/browse_form.php');
 
 // ip validation moved to enroll.php
 
@@ -14,11 +15,16 @@ if(! $pagedata) {
     $pagedata = staffenroll_getsubcourses($parentid);
 }
 
-// output page
+// DEBUG
+// should actually send in raw pagedata
+$dbug = var_export($pagedata, true);
+$args = array(
+    'pagedata' => $dbug,
+);
+$browseform = new staffenroll_browse_form(NULL, $args);
 
 // get site information to use in the page
 $site = get_site();
-
 // set the page settings and navigation
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url($CFG->wwwroot . '/block/staffenroll/browse.php');
@@ -33,22 +39,5 @@ foreach ($breadcrumbs as $bc) {
 
 // print the header
 echo $OUTPUT->header();
-
-echo html_writer::tag('h2', get_string('pluginname',
-                                        'local_support_staff_enroll'));
-
-if ($subcategories || $courses) {
-    if ($subcategories) {
-        echo support_staff_enroll_get_subcats_table($subcategories);
-    }
-
-    if ($courses) {
-        echo support_staff_enroll_get_courses_table($courses);
-    }
-} else {
-    $msg = get_string('no_courses_or_subcats', 'local_support_staff_enroll');
-    echo html_writer::tag('p', $msg);
-}
-
-// Print the footer
+$browseform->display();
 echo $OUTPUT->footer();

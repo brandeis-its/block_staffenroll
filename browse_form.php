@@ -4,20 +4,37 @@
 // https://docs.moodle.org/dev/Blocks_Advanced
 require_once("{$CFG->libdir}/formslib.php");
 
-class simplehtml_form extends moodleform {
+class staffenroll_browse_form extends moodleform {
 
     function definition() {
 
         $mform =& $this->_form;
-        $mform->addElement('header','displayinfo', get_string('textfields', 'block_simplehtml'));
-        // add page title element.
-        $mform->addElement('text', 'pagetitle', get_string('pagetitle', 'block_simplehtml'));
-        $mform->setType('pagetitle', PARAM_RAW);
-        $mform->addRule('pagetitle', null, 'required', null, 'client');
+        $pagedata = $this->_customdata['pagedata'];
 
-        // add display text field
-        $mform->addElement('htmleditor', 'displaytext', get_string('displayedhtml', 'block_simplehtml'));
-        $mform->setType('displaytext', PARAM_RAW);
-        $mform->addRule('displaytext', null, 'required', null, 'client');
+        $mform->addElement(
+            'header',
+            'displayinfo',
+            get_string('pluginname', 'block_staffenroll')
+        );
+        $mform->addElement('html', "<pre>$pagedata</pre>");
     }
 }
+
+/*
+ * FIXME: display code from browse.php
+ * needs to be reworked for form
+
+if ($subcategories || $courses) {
+    if ($subcategories) {
+        echo support_staff_enroll_get_subcats_table($subcategories);
+    }
+
+    if ($courses) {
+        echo support_staff_enroll_get_courses_table($courses);
+    }
+} else {
+    $msg = get_string('no_courses_or_subcats', 'local_support_staff_enroll');
+    echo html_writer::tag('p', $msg);
+}
+
+ */
