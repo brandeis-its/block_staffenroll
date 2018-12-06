@@ -50,6 +50,7 @@ class block_staffenroll extends block_base {
                 '/course/view.php',
                 array('id' => $crsid)
             );
+
             foreach($elist as $e) {
                 $course_label = $e['shortname'] or $crsid;
                 $link_text = implode(' ', array(
@@ -77,14 +78,13 @@ class block_staffenroll extends block_base {
             $contentText[] = 'unenroll link';
         }
         else if($currentContext->contextlevel == CONTEXT_USER){
-            //$contentText[] = 'enroll link';
-            $this->populateEnrollLink($contentText);
+            $contentText = $this->populateEnrollLink();
         }
         else {
             $contentText[] = 'cannot place block in this context.';
         }
 
-        $this->content->text = implode("\n", $contentText);
+        $this->content->text = implode("<br>\n", $contentText);
         $this->content->footer = '';
         return $this->content;
     }
