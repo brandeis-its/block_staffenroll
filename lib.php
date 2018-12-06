@@ -210,7 +210,10 @@ function staffenroll_getuserenrollments($userid = 0) {
     $enrollments = array();
     $records = $DB->get_records_sql($query);
     foreach($records as $r) {
-        $enrollments[$r->courseid] = array(
+        if(! isset($enrollments[$r->courseid])) {
+            $enrollments[$r->courseid] = array();
+        }
+        $enrollments[$r->courseid][] = array(
             'idnumber' => $r->idnumber,
             'shortname' => $r->shortname,
             'rolename' => $r->rolename,

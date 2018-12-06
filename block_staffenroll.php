@@ -26,7 +26,7 @@ class block_staffenroll extends block_base {
 
     // validates user, populates link and previous enrollments
     function populateEnrollLink($ct = array()) {
-       $rolename = staffenroll_canenroll();
+        $rolename = staffenroll_canenroll();
         if($rolename == 'none') {
             $ct[] = 'no permission to enroll';
             return;
@@ -45,17 +45,19 @@ class block_staffenroll extends block_base {
         $enrollments = staffenroll_getuserenrollments();
 
         // add links to courses the user is currently enrolled as support staff
-        foreach($enrollments as $e) {
+        foreach($enrollments as $crsid => $elist) {
             $url = new moodle_url(
                 '/course/view.php',
-                array('id' => $e->courseid)
+                array('id' => $crsid)
             );
-            $course_label = $e->course_shortname or $e->courseid;
-            $link_text = implode(' ', array(
-                $course_label,
-                '(' . $e->role_name . ')'
-            ));
-            $ct[] = html_writer::link($url, $link_text);
+            foreach($elist as $e) {
+                $course_label = $e['shortname'] or $crsid;
+                $link_text = implode(' ', array(
+                    $course_label,
+                    '(' . $e['rolename'] . ')'
+                ));
+                $ct[] = html_writer::link($url, $link_text);
+            }
         }
         return $ct;
     }
