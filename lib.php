@@ -35,7 +35,7 @@ function staffenroll_unexpiredcache($tsk) {
         return false;
     }
     $now = time();
-    $coursescategoriesexpiration = get_config('block_staffenroll', 'coursescategoriesexpiration');
+    $cacheexpiration = get_config('block_staffenroll', 'cacheexpiration');
     $secondsdiff = $now - $timestamp;
 
     // FIXME: this is just to verify expiration logic is working as expected
@@ -44,12 +44,12 @@ function staffenroll_unexpiredcache($tsk) {
         '!!!  $timestamp: ' . $timestamp,
         '$now: ' . $now,
         '$secondsdiff: ' . $secondsdiff,
-        '$coursescategoriesexpiration: ' . $coursescategoriesexpiration
+        '$cacheexpiration: ' . $cacheexpiration
     );
     $msg = implode(', ', $error);
     error_log($msg);
 
-    if($secondsdiff < $coursescategoriesexpiration) {
+    if($secondsdiff < $cacheexpiration) {
         return true;
     }
     return false;
