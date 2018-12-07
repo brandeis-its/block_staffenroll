@@ -16,8 +16,8 @@ $PAGE->set_heading($site->fullname);
 $PAGE->set_title(strip_tags($site->fullname));
 $PAGE->set_cacheable(false);
 
-$parentid = optional_param('parent', '', PARAM_INT);
-$courseid = optional_param('course', '', PARAM_INT);
+$parentid = optional_param('parentid', '', PARAM_INT);
+$courseid = optional_param('courseid', '', PARAM_INT);
 
 $breadcrumbs = staffenroll_getbreadcrumbs($parentid);
 foreach ($breadcrumbs as $bc) {
