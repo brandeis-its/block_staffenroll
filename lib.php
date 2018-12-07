@@ -379,22 +379,22 @@ function staffenroll_getsubcourses($pid) {
             );
         }
         $now = time();
-        $coursecategories->set($cachetimestamp, $now);
-        $coursecategories->set($cachekey, $subcrs);
+        $coursescategories->set($cachetimestamp, $now);
+        $coursescategories->set($cachekey, $subcrs);
     }
 
     $enrollments = staffenroll_getuserenrollments($USER->id);
     $courses = array();
     foreach($subcrs as $c) {
-        $ok = staffenroll_canenroll($c->id);
-        if(! $ok or $c->id == 1) {
+        $ok = staffenroll_canenroll($c['id']);
+        if(! $ok or $c['id'] == 1) {
             // homepage not course
             continue;
         }
 
         $roles = NULL;
-        if(isset($enrollments[$c->id])) {
-            $roles = $enrollments[$c->id];
+        if(isset($enrollments[$c['id']])) {
+            $roles = $enrollments[$c['id']];
         }
         $c['roles'] = $roles;
         $courses[] = $c;
