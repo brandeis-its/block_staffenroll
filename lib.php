@@ -79,7 +79,7 @@ function staffenroll_getprohibitedcategorieslist() {
         'course_categories',
         array('visible' => 1),
         'path',
-        'id,name,depth,path'
+        'id, name, depth, path'
     );
 
     // maps ids to names so that paths can be "decoded"
@@ -249,33 +249,7 @@ function staffenroll_validatenetworkhost() {
     }
     return false;
 }
-/*
-function support_staff_enroll_get_subcats_table($subcats) {
-    $table = new html_table();
 
-    $table_head_cell = new html_table_cell(
-        get_string('subcats_table_head', 'local_support_staff_enroll')
-    );
-
-    $table_head_cell->colspan = 2;
-
-    $table->head = array($table_head_cell);
-
-    $table->data = array();
-    foreach ($subcats as $subcat) {
-        $subcat_url = new moodle_url(
-            '/local/support_staff_enroll/courses_view.php',
-            array( 'parent' => $subcat['id'] )
-        );
-
-        $subcat_link = html_writer::link( $subcat_url, $subcat['name'] );
-
-        $table->data[] = array( $subcat_link, $subcat['descr'] );
-    }
-
-    return html_writer::table($table);
-}
- */
 function staffenroll_getsubcategorylist($subcats = array()) {
     $items = array();
     foreach($subcats as $sc) {
@@ -341,16 +315,88 @@ function staffenroll_getsubcategories($pid) {
 
         if($skip) { continue; }
 
-        $subcats[] = array(
-            'id'    => $r->id,
-            'name'  => $r->name,
-            'description' => $r->description
-        );
+            $subcats[] = array(
+                'id'    => $r->id,
+                'name'  => $r->name,
+                'description' => $r->description
+            );
     }
     $now = time();
     $coursescategories->set($cachetimestamp, $now);
     $coursescategories->set($cachekey, $subcats);
     return $subcats;
+}
+
+/*
+function support_staff_enroll_get_subcats_table($subcats) {
+    $table = new html_table();
+
+    $table_head_cell = new html_table_cell(
+        get_string('subcats_table_head', 'local_support_staff_enroll')
+    );
+
+    $table_head_cell->colspan = 2;
+
+    $table->head = array($table_head_cell);
+
+    $table->data = array();
+    foreach ($subcats as $subcat) {
+        $subcat_url = new moodle_url(
+            '/local/support_staff_enroll/courses_view.php',
+            array( 'parent' => $subcat['id'] )
+        );
+
+        $subcat_link = html_writer::link( $subcat_url, $subcat['name'] );
+
+        $table->data[] = array( $subcat_link, $subcat['descr'] );
+    }
+
+    return html_writer::table($table);
+}
+ */
+function staffenroll_getsubcourseslist($subcrs = array()) {
+    $items = array();
+    foreach($subcrs as $sc) {
+        $subitems = array();
+        $studenturl = new moodle_url(
+            '/blocks/staffenroll/enroll.php',
+            array(
+                'courseid' => $sc['id'],
+                'type' => 'student' 
+            )
+        );
+        $studentlink = html_writer::link($studenturl, 'student');
+        $subitems[] = $studentlink;
+        $staffurl = new moodle_url(
+            '/blocks/staffenroll/enroll.php',
+            array(
+                'courseid' => $sc['id'],
+                'type' => 'staff' 
+            )
+        );
+        $stafflink = html_writer::link($staffurl, 'staff');
+        $subitems[] = $stafflink;
+        $sublist = html_writer::alist($subitems);
+        $text = $sc['shortname'];
+        $fullname = trim($sc['fullname']);
+        if(count($fullname) > 0) {
+            $text = $fullname;
+        }
+        $summary = trim($sc['summary']);
+        $i = preg_match('/\w+/', $summary);
+        if($i == 1) {
+            $text .= ' (' . $summary . ')';
+        }
+        $item = implode(' ', array(
+            $text,
+            $sublist
+        ));
+        $items[] = $item; 
+    }
+    if(count($items) > 0) {
+        return html_writer::alist($items);
+    }
+    return html_writer::div('no courses found');
 }
 
 function staffenroll_getsubcourses($pid) {
@@ -362,25 +408,25 @@ function staffenroll_getsubcourses($pid) {
     $ok = staffenroll_unexpiredcache($cachetimestamp);
     $subcrs = array();
     if($ok) {
-        $subcrs = $coursescategories->get($cachekey);
+        return $coursescategories->get($cachekey);
     }
     else {
         $records = $DB->get_records(
             'course',
             array('category' => $pid),
-            'sortorder'
+            'sortorder',
+            'id, idnumber, shortname, fullname, summary, category'
         );
         foreach($records as $r) {
             $subcrs[] = array(
                 'id' => $r->id,
                 'idnumber' => $r->idnumber,
                 'shortname' => $r->shortname,
-                'summary' => $r->summary
+                'fullname' => $r->fullname,
+                'summary' => $r->summary,
+                'category' => $r->category
             );
         }
-        $now = time();
-        $coursescategories->set($cachetimestamp, $now);
-        $coursescategories->set($cachekey, $subcrs);
     }
 
     $enrollments = staffenroll_getuserenrollments($USER->id);
@@ -392,13 +438,16 @@ function staffenroll_getsubcourses($pid) {
             continue;
         }
 
-        $roles = NULL;
+        $roles = array();
         if(isset($enrollments[$c['id']])) {
             $roles = $enrollments[$c['id']];
         }
         $c['roles'] = $roles;
         $courses[] = $c;
     }
+    $now = time();
+    $coursescategories->set($cachetimestamp, $now);
+    $coursescategories->set($cachekey, $courses);
     return $courses;
 }
 
