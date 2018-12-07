@@ -249,6 +249,58 @@ function staffenroll_validatenetworkhost() {
     }
     return false;
 }
+/*
+function support_staff_enroll_get_subcats_table($subcats) {
+    $table = new html_table();
+
+    $table_head_cell = new html_table_cell(
+        get_string('subcats_table_head', 'local_support_staff_enroll')
+    );
+
+    $table_head_cell->colspan = 2;
+
+    $table->head = array($table_head_cell);
+
+    $table->data = array();
+    foreach ($subcats as $subcat) {
+        $subcat_url = new moodle_url(
+            '/local/support_staff_enroll/courses_view.php',
+            array( 'parent' => $subcat['id'] )
+        );
+
+        $subcat_link = html_writer::link( $subcat_url, $subcat['name'] );
+
+        $table->data[] = array( $subcat_link, $subcat['descr'] );
+    }
+
+    return html_writer::table($table);
+}
+ */
+function staffenroll_getsubcateorylist($subcats = array()) {
+    $items = array();
+    foreach($subcats as $sc) {
+        $url = new moodle_url(
+            '/blocks/staffenroll/browse.php',
+            array('parentid' => $sc['id'] )
+        );
+        $text = $sc['name'];
+        if(isset($sc['description'])) {
+            $desc = trim($sc['description']);
+            if(count($desc) > 0) {
+                $text = implode(' ', array(
+                    $desc,
+                    '(' . $sc['name'] . ')'
+                ));
+            }
+        }
+        $link = html_writer::link($url, $sc['name']);
+        $items[] = $link;
+    }
+    if(count($items) > 0) {
+        return html_writer::alist($items);
+    }
+    return html_writer::div('no categories found');
+}
 
 function staffenroll_getsubcategories($pid) {
     global $DB;
@@ -335,24 +387,25 @@ function staffenroll_getsubcourses($pid) {
 }
 
 
-function staffenroll_getbreadcrumbs($categoryid) {
+function staffenroll_getbreadcrumbs($categoryid = 0) {
     global $DB;
 
     $breadcrumbs = array();
-    $linktext = get_string('breadcrumblinktext', 'staffenroll');
+    $linktext = get_string('breadcrumblinktext', 'block_staffenroll');
     $breadcrumbs[] = array(
-        'name' => $link_text,
-        'href' => 'browsecourses.php',
+        'name' => $linktext,
+        'href' => 'browse.php',
     );
 
-    $category = $DB->get_record(
-        'course_categories',
-        array('id' => $categoryid)
-    );
+    $category = false;
+    if($categoryid != 0) {
+        $category = $DB->get_record(
+            'course_categories',
+            array('id' => $categoryid)
+        );
+    }
 
-    // FIXME: this should be an exception
     if(! $category) {
-        error_log('ERR: no categories returned from id: ' . $categoryid);
         return $breadcrumbs;
     }
 
