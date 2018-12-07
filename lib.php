@@ -324,7 +324,23 @@ function staffenroll_getsubcategories($pid) {
     );
 
     $subcats = array();
+    $rawpc = get_config(
+        'block_staffenroll',
+        'prohibitedcategories'
+    );
+    $prohibitedcategories = explode(',', $rawpc);
     foreach($results as $r) {
+        $skip = false;
+        $key = 'cat' . $r->id;
+        foreach($prohibitedcategories as $pc) {
+            if($key == $pc) {
+                $skip = true;
+                break;
+            }
+        }
+
+        if($skip) { continue; }
+
         $subcats[] = array(
             'id'    => $r->id,
             'name'  => $r->name,
