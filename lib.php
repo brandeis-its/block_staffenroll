@@ -276,7 +276,7 @@ function support_staff_enroll_get_subcats_table($subcats) {
     return html_writer::table($table);
 }
  */
-function staffenroll_getsubcateorylist($subcats = array()) {
+function staffenroll_getsubcategorylist($subcats = array()) {
     $items = array();
     foreach($subcats as $sc) {
         $url = new moodle_url(
@@ -431,10 +431,11 @@ function staffenroll_getbreadcrumbs($categoryid = 0) {
         if(! $results) {
             // FIXME: throw exception
             error_log('missing category for id: ' . $id);
+            continue;
         }
         $href = new moodle_url(
-            '/blocks/staffenroll/browsecourses.php',
-            array('parent' => $results->id)
+            '/blocks/staffenroll/browse.php',
+            array('parentid' => $results->id)
         );
 
         $breadcrumbs[] = array(
