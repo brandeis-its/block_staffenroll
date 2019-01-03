@@ -5,19 +5,30 @@ require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 require_once($CFG->dirroot . '/blocks/staffenroll/browse_form.php');
 
 // ip validation moved to enroll.php
+// "logic" mostly stolen from course/index.php
 
 
-// get site information to use in the page
+
 $site = get_site();
-// set the page settings and navigation
-$PAGE->set_context(context_system::instance());
-$PAGE->set_url($CFG->wwwroot . '/block/staffenroll/browse.php');
-$PAGE->set_heading($site->fullname);
-$PAGE->set_title(strip_tags($site->fullname));
+$title = get_string('block_staffenroll', 'pluginname');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+$pageurl = new moodle_url(
+    '/blocks/staffenroll/browse.php',
+    array('parentid' => $parentid)
+);
+$PAGE->set_url($pageurl);
 $PAGE->set_cacheable(false);
 
-$parentid = optional_param('parentid', '', PARAM_INT);
-$courseid = optional_param('courseid', '', PARAM_INT);
+$parentid = optional_param('parentid', 0, PARAM_INT);
+if($parentid) {
+    $PAGE->set_category_by_id($parentid);
+    $PAGE->set_pagetype('course-index-category');
+    $PAGE->set_pagelayout('coursecategory');
+}
+else {
+    $PAGE->set_context(context_system::instance());
+}
 
 $breadcrumbs = staffenroll_getbreadcrumbs($parentid);
 foreach ($breadcrumbs as $bc) {
@@ -29,17 +40,13 @@ $pagedata = staffenroll_getsubcategories($parentid);
 $pagehtml = NULL;
 if(! $pagedata) {
     $pagedata = staffenroll_getsubcourses($parentid);
-    // FIXME: generate $pagehtml
+    $pagehtml = staffenroll_getsubcourselist($pagedata);
 }
 else {
     $pagehtml = staffenroll_getsubcategorylist($pagedata);
 }
 
-$args = array(
-    'pagehtml' => $pagehtml,
-);
-$browseform = new staffenroll_browse_form(NULL, $args);
 // print the header
-echo $OUTPUT->header();
-$browseform->display();
-echo $OUTPUT->footer();
+echo $renderer->header();
+echo $pagehtml;
+echo $renderer->footer();

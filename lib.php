@@ -267,7 +267,7 @@ function staffenroll_getsubcategorylist($subcats = array()) {
                 ));
             }
         }
-        $link = html_writer::link($url, $sc['name']);
+        $link = html_writer::link($url, $text);
         $items[] = $link;
     }
     if(count($items) > 0) {
@@ -354,6 +354,22 @@ function support_staff_enroll_get_subcats_table($subcats) {
     return html_writer::table($table);
 }
  */
+function staffenroll_getsubcourselist($subcrs = array()) {
+    $items = array();
+    foreach($subcrs as $sc) {
+        $url = new moodle_url(
+            '/blocks/staffenroll/enroll.php',
+            array('courseid' => $sc['id'] )
+        );
+        $link = html_writer::link($url, $sc['fullname']);
+        $items[] = $link;
+    }
+    if(count($items) > 0) {
+        return html_writer::alist($items);
+    }
+    return html_writer::div('no courses found');
+}
+
 function staffenroll_getsubcourseslist($subcrs = array()) {
     $items = array();
     foreach($subcrs as $sc) {
