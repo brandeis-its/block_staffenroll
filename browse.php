@@ -10,23 +10,29 @@ require_once($CFG->dirroot . '/blocks/staffenroll/browse_form.php');
 
 
 $site = get_site();
-$title = get_string('block_staffenroll', 'pluginname');
+$title = get_string('pluginname', 'block_staffenroll');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
-$pageurl = new moodle_url(
-    '/blocks/staffenroll/browse.php',
-    array('parentid' => $parentid)
-);
-$PAGE->set_url($pageurl);
-$PAGE->set_cacheable(false);
 
 $parentid = optional_param('parentid', 0, PARAM_INT);
+$PAGE->set_cacheable(false);
+
 if($parentid) {
+    $pageurl = new moodle_url(
+        '/blocks/staffenroll/browse.php',
+        array('parentid' => $parentid)
+    );
+    $PAGE->set_url($pageurl);
     $PAGE->set_category_by_id($parentid);
     $PAGE->set_pagetype('course-index-category');
     $PAGE->set_pagelayout('coursecategory');
+    require_login();
 }
 else {
+    $pageurl = new moodle_url(
+        '/blocks/staffenroll/browse.php'
+    );
+    $PAGE->set_url($pageurl);
     $PAGE->set_context(context_system::instance());
 }
 
@@ -47,6 +53,6 @@ else {
 }
 
 // print the header
-echo $renderer->header();
+echo $OUTPUT->header();
 echo $pagehtml;
-echo $renderer->footer();
+echo $OUTPUT->footer();
