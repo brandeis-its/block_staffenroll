@@ -1,11 +1,38 @@
 <?php
 
-// also require_login
+require_once('../../config.php');
+require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
+
+$site = get_site();
+
+// FIXME: should be required para
+$courseid = optional_param('courseid', 0, PARAM_INT);
+$pageurl = new moodle_url(
+    '/blocks/staffenroll/enroll.php',
+    array('courseid' => $courseid)
+);
+$PAGE->set_url($pageurl);
+require_login();
+$title = get_string('pluginname', 'block_staffenroll');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
+
+$breadcrumbs = staffenroll_getbreadcrumbs($parentid);
+foreach ($breadcrumbs as $bc) {
+    $PAGE->navbar->add($bc['name'], $bc['href']);
+}
+
 $ok = staffenroll_validatenetworkhost();
 if(! $ok) {
     // FIXME: abort processing on this error
     error_log('!!! invalid ip: ' . $_SERVER['REMOTE_ADDR']);
 }
+
+// print the header
+echo $OUTPUT->header();
+echo html_writer::div('courseid: ' . $courseid);
+echo html_writer::div('$_SERVER[REMOTE_ADDR]: ' . $_SERVER['REMOTE_ADDR']);
+echo $OUTPUT->footer();
 
 // this is enrol/unenroll code taken from previous version of plugin
 // this file should contain actual enroll/unenroll code

@@ -2,15 +2,8 @@
 
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
-require_once($CFG->dirroot . '/blocks/staffenroll/browse_form.php');
-
-// ip validation moved to enroll.php
-// "logic" mostly stolen from course/index.php
-
-
 
 $site = get_site();
-
 $parentid = optional_param('parentid', 0, PARAM_INT);
 $PAGE->set_cacheable(false);
 
