@@ -3,6 +3,8 @@
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
+require_login();
+
 $site = get_site();
 
 // FIXME: should be required para
@@ -12,12 +14,11 @@ $pageurl = new moodle_url(
     array('courseid' => $courseid)
 );
 $PAGE->set_url($pageurl);
-require_login();
 $title = get_string('pluginname', 'block_staffenroll');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-$breadcrumbs = staffenroll_getbreadcrumbs($parentid);
+$breadcrumbs = staffenroll_getbreadcrumbs($courseid);
 foreach ($breadcrumbs as $bc) {
     $PAGE->navbar->add($bc['name'], $bc['href']);
 }
@@ -31,7 +32,6 @@ if(! $ok) {
 // print the header
 echo $OUTPUT->header();
 echo html_writer::div('courseid: ' . $courseid);
-echo html_writer::div('$_SERVER[REMOTE_ADDR]: ' . $_SERVER['REMOTE_ADDR']);
 echo $OUTPUT->footer();
 
 // this is enrol/unenroll code taken from previous version of plugin
