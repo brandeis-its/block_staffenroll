@@ -164,15 +164,11 @@ function staffenroll_canenroll($courseid = 0) {
 // get existing enrollments for the current user as some kind of support staff
 function staffenroll_getuserenrollments($userid = 0) {
     global $DB, $USER;
-    $roleids = [];
+    $roleids = array();
     $tmp = get_config('block_staffenroll', 'staffrole');
-    if(is_int($tmp)) {
-        $roleids[] = $tmp;
-    }
+    $roleids[] = intval($tmp);
     $tmp = get_config('block_staffenroll', 'studentrole');
-    if(is_int($tmp)) {
-        $roleids[] = $tmp;
-    }
+    $roleids[] = intval($tmp);
     $totalroleids = count($roleids);
     $roleidsql = '';
     if($totalroleids == 0) {
