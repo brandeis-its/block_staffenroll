@@ -132,8 +132,6 @@ function staffenroll_getprohibitedcategorieslist() {
 // BLOCK
 
 // returns true if the current user can enroll as some type of support staff
-// FIXME: this should return one of three values
-// student, staff, false (none)
 function staffenroll_canenroll($courseid = 0) {
     global $USER;
     $context = NULL;
@@ -166,8 +164,15 @@ function staffenroll_canenroll($courseid = 0) {
 // get existing enrollments for the current user as some kind of support staff
 function staffenroll_getuserenrollments($userid = 0) {
     global $DB, $USER;
-    $courseroles = staffenroll_getroles();
-    $roleids = array_keys($courseroles);
+    $roleids = [];
+    $tmp = get_config('block_staffenroll', 'staffrole');
+    if(is_int($tmp)) {
+        $roleids[] = $tmp;
+    }
+    $tmp = get_config('block_staffenroll', 'studentrole');
+    if(is_int($tmp)) {
+        $roleids[] = $tmp;
+    }
     $totalroleids = count($roleids);
     $roleidsql = '';
     if($totalroleids == 0) {
@@ -260,7 +265,7 @@ function staffenroll_getsubcategorylist($subcats = array()) {
         $text = $sc['name'];
         if(isset($sc['description'])) {
             $desc = trim($sc['description']);
-            if(count($desc) > 0) {
+            if(preg_match('/\w+/', $desc)) {
                 $text = implode(' ', array(
                     $desc,
                     '(' . $sc['name'] . ')'
@@ -378,7 +383,7 @@ function staffenroll_getsubcourseslist($subcrs = array()) {
             '/blocks/staffenroll/enroll.php',
             array(
                 'courseid' => $sc['id'],
-                'type' => 'student' 
+                'type' => 'student'
             )
         );
         $studentlink = html_writer::link($studenturl, 'student');
@@ -387,7 +392,7 @@ function staffenroll_getsubcourseslist($subcrs = array()) {
             '/blocks/staffenroll/enroll.php',
             array(
                 'courseid' => $sc['id'],
-                'type' => 'staff' 
+                'type' => 'staff'
             )
         );
         $stafflink = html_writer::link($staffurl, 'staff');
@@ -407,7 +412,7 @@ function staffenroll_getsubcourseslist($subcrs = array()) {
             $text,
             $sublist
         ));
-        $items[] = $item; 
+        $items[] = $item;
     }
     if(count($items) > 0) {
         return html_writer::alist($items);

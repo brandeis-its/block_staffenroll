@@ -10,9 +10,6 @@ require_once($CFG->dirroot . '/blocks/staffenroll/browse_form.php');
 
 
 $site = get_site();
-$title = get_string('pluginname', 'block_staffenroll');
-$PAGE->set_title($title);
-$PAGE->set_heading($title);
 
 $parentid = optional_param('parentid', 0, PARAM_INT);
 $PAGE->set_cacheable(false);
@@ -35,6 +32,10 @@ else {
     $PAGE->set_url($pageurl);
     $PAGE->set_context(context_system::instance());
 }
+
+$title = get_string('pluginname', 'block_staffenroll');
+$PAGE->set_title($title);
+$PAGE->set_heading($title);
 
 $breadcrumbs = staffenroll_getbreadcrumbs($parentid);
 foreach ($breadcrumbs as $bc) {
