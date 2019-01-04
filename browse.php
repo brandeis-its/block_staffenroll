@@ -40,7 +40,7 @@ $pagedata = staffenroll_getsubcategories($parentid);
 $pagehtml = NULL;
 if(! $pagedata) {
     $pagedata = staffenroll_getsubcourses($parentid);
-    $pagehtml = staffenroll_getsubcourselist($pagedata);
+    $pagehtml = staffenroll_getsubcourselist($pagedata, $parentid);
 }
 else {
     $pagehtml = staffenroll_getsubcategorylist($pagedata);

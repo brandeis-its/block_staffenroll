@@ -3,22 +3,23 @@
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
-require_login();
-
 $site = get_site();
 
 // FIXME: should be required para
 $courseid = optional_param('courseid', 0, PARAM_INT);
+$parentid = optional_param('parentid', 0, PARAM_INT);
+$coursecontext = context_course::instance($courseid);
+$PAGE->set_context($coursecontext);
 $pageurl = new moodle_url(
     '/blocks/staffenroll/enroll.php',
-    array('courseid' => $courseid)
+    array('courseid' => $courseid, 'parentid' => $parentid)
 );
 $PAGE->set_url($pageurl);
 $title = get_string('pluginname', 'block_staffenroll');
 $PAGE->set_title($title);
 $PAGE->set_heading($title);
 
-$breadcrumbs = staffenroll_getbreadcrumbs($courseid);
+$breadcrumbs = staffenroll_getbreadcrumbs($parentid);
 foreach ($breadcrumbs as $bc) {
     $PAGE->navbar->add($bc['name'], $bc['href']);
 }

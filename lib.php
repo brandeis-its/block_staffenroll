@@ -328,39 +328,12 @@ function staffenroll_getsubcategories($pid) {
     return $subcats;
 }
 
-/*
-function support_staff_enroll_get_subcats_table($subcats) {
-    $table = new html_table();
-
-    $table_head_cell = new html_table_cell(
-        get_string('subcats_table_head', 'local_support_staff_enroll')
-    );
-
-    $table_head_cell->colspan = 2;
-
-    $table->head = array($table_head_cell);
-
-    $table->data = array();
-    foreach ($subcats as $subcat) {
-        $subcat_url = new moodle_url(
-            '/local/support_staff_enroll/courses_view.php',
-            array( 'parent' => $subcat['id'] )
-        );
-
-        $subcat_link = html_writer::link( $subcat_url, $subcat['name'] );
-
-        $table->data[] = array( $subcat_link, $subcat['descr'] );
-    }
-
-    return html_writer::table($table);
-}
- */
-function staffenroll_getsubcourselist($subcrs = array()) {
+function staffenroll_getsubcourselist($subcrs = array(), $pid = 0) {
     $items = array();
     foreach($subcrs as $sc) {
         $url = new moodle_url(
             '/blocks/staffenroll/enroll.php',
-            array('courseid' => $sc['id'] )
+            array('courseid' => $sc['id'], 'parentid' => $pid)
         );
         $link = html_writer::link($url, $sc['fullname']);
         $items[] = $link;
@@ -371,7 +344,8 @@ function staffenroll_getsubcourselist($subcrs = array()) {
     return html_writer::div('no courses found');
 }
 
-function staffenroll_getsubcourseslist($subcrs = array()) {
+/*
+function staffenroll_getsubcourseslist($subcrs = array(), $pid = 0) {
     $items = array();
     foreach($subcrs as $sc) {
         $subitems = array();
@@ -415,6 +389,7 @@ function staffenroll_getsubcourseslist($subcrs = array()) {
     }
     return html_writer::div('no courses found');
 }
+ */
 
 function staffenroll_getsubcourses($pid) {
     global $DB, $USER;
