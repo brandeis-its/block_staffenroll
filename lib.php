@@ -260,7 +260,7 @@ function staffenroll_getcourseinstructors($courseid) {
     $SQL = implode(' ', array(
         'SELECT u.id, u.firstname, u.lastname, ra.roleid',
         'FROM mdl_role_assignments ra',
-        'INNER JOIN mdl_user u ON ra.userid = u.id' .
+        'INNER JOIN mdl_user u ON ra.userid = u.id',
         'WHERE contextid = ?',
         $roleSQL,
         'ORDER BY u.firstname'
