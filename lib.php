@@ -374,8 +374,7 @@ function staffenroll_getsubcourselist($subcrs = array(), $pid = 0) {
         );
         $link = html_writer::link($url, $sc['fullname']);
         if(isset($sc['instructors'])) {
-            $instrString = implode(', ', $sc['instructors']);
-            $link .= "<br>$instrString";
+            $link .= ": " . $sc['instructors'];
         }
         $items[] = $link;
     }
@@ -464,12 +463,18 @@ function staffenroll_getbreadcrumbs($categoryid = 0) {
 
     $categoryids = explode("/", $category->path);
     foreach($categoryids as $id) {
+        $ok = preg_match('/\d+/', $id);
+        if(! $ok) {
+            continue;
+        }
         $results = $DB->get_record('course_categories', array('id' => $id));
+        /*
         if(! $results) {
             // FIXME: throw exception
             error_log('missing category for id: ' . $id);
             continue;
         }
+         */
         $href = new moodle_url(
             '/blocks/staffenroll/browse.php',
             array('parentid' => $results->id)
