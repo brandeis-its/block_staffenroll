@@ -104,6 +104,15 @@ $settings->add(
     )
 );
 
+$settings->add(
+    new admin_setting_configmultiselect(
+        'block_staffenroll/instructorroles',
+        get_string('instructorroleslabel', 'block_staffenroll'),
+        get_string('instructorrolesdesc', 'block_staffenroll'),
+        NULL,
+        $courseRoles
+    )
+);
 
 $settings->add(
     new admin_setting_configduration(

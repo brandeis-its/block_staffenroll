@@ -1,6 +1,9 @@
 <?php
 
+///////////
 // SETTINGS
+///////////
+
 
 function staffenroll_getroles($t = 'course') {
     global $DB;
@@ -54,6 +57,7 @@ function staffenroll_unexpiredcache($tsk) {
     }
     return false;
 }
+
 
 function staffenroll_getprohibitedcategorieslist() {
     global $DB;
@@ -129,7 +133,11 @@ function staffenroll_getprohibitedcategorieslist() {
 }
 
 
+
+////////
 // BLOCK
+////////
+
 
 // returns true if the current user can enroll as some type of support staff
 function staffenroll_canenroll($courseid = 0) {
@@ -161,8 +169,9 @@ function staffenroll_canenroll($courseid = 0) {
     return 'none';
 }
 
+
 // get existing enrollments for the current user as some kind of support staff
-function staffenroll_getuserenrollments($userid = 0) {
+function staffenroll_getuserstaffenrollments($userid = 0) {
     global $DB, $USER;
     $roleids = array();
     $tmp = get_config('block_staffenroll', 'staffrole');
@@ -225,31 +234,57 @@ function staffenroll_getuserenrollments($userid = 0) {
 }
 
 
+function staffenroll_getcourseinstructors($courseid) {
+    global $DB;
 
-// BROWSECOURSES
+    $instructors = array();
+    $rawir = get_config(
+        'block_staffenroll',
+        'instructorroles'
+    );
+    $instructorroleids = explode(',', $rawir);
 
-// based on
-// https://stackoverflow.com/questions/594112/matching-an-ip-to-a-cidr-mask-in-php-5
-function staffenroll_validatenetworkhost() {
-    $hostip = $_SERVER['REMOTE_ADDR'];
-    $ip = ip2long($hostip);
-    $allowednetworks = get_config('block_staffenroll', 'allowednetworks');
-    $networks = explode("\n", $allowednetworks);
-    foreach($networks as $n) {
-        //list ($subnet, $bits) = explode('/', $range);
-        list ($subnet, $bits) = explode('/', $n);
-        if ($bits === null) {
-            $bits = 32;
-        }
-        $subnet = ip2long($subnet);
-        $mask = -1 << (32 - $bits);
-        $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
-        if(($ip & $mask) == $subnet) {
-            return true;
-        }
+    $totalRoleids = count($instructorroleids);
+    $roleSql = '';
+    if($totalRoleids == 0) {
+        return $instructors;
     }
-    return false;
+    elseif($totalRoleids == 1) {
+        $roleSQL = "AND roleid = $instructorroles[0]";
+    }
+    else {
+        $roleidString = implode(', ', $instructorroleids);
+        $roleSQL = "AND roleid in ($roleidString)";
+    }
+
+    $SQL = implode(' ', array(
+        'SELECT u.id, u.firstname, u.lastname, ra.roleid',
+        'FROM mdl_role_assignments ra',
+        'INNER JOIN mdl_user u ON ra.userid = u.id' .
+        'WHERE contextid = ?',
+        $roleSQL,
+        'ORDER BY u.firstname'
+    ));
+
+    $context = context_course::instance($courseid);
+    $results = $DB->get_records_sql($SQL, array($context->id) );
+    foreach ($results as $result) {
+        // add the teacher's name to the array for their role
+        $instructors[] = implode(' ', array(
+            $result->firstname,
+            $result->lastname
+        ));
+    }
+
+    return $instructors;
 }
+
+
+
+/////////
+// BROWSE
+/////////
+
 
 function staffenroll_getsubcategorylist($subcats = array()) {
     $items = array();
@@ -276,6 +311,7 @@ function staffenroll_getsubcategorylist($subcats = array()) {
     }
     return html_writer::div('no categories found');
 }
+
 
 function staffenroll_getsubcategories($pid) {
     global $DB;
@@ -316,17 +352,18 @@ function staffenroll_getsubcategories($pid) {
 
         if($skip) { continue; }
 
-            $subcats[] = array(
-                'id'    => $r->id,
-                'name'  => $r->name,
-                'description' => $r->description
-            );
+        $subcats[] = array(
+            'id'    => $r->id,
+            'name'  => $r->name,
+            'description' => $r->description
+        );
     }
     $now = time();
     $coursescategories->set($cachetimestamp, $now);
     $coursescategories->set($cachekey, $subcats);
     return $subcats;
 }
+
 
 function staffenroll_getsubcourselist($subcrs = array(), $pid = 0) {
     $items = array();
@@ -336,6 +373,10 @@ function staffenroll_getsubcourselist($subcrs = array(), $pid = 0) {
             array('courseid' => $sc['id'], 'parentid' => $pid)
         );
         $link = html_writer::link($url, $sc['fullname']);
+        if(isset($sc['instructors'])) {
+            $instrString = implode(', ', $sc['instructors']);
+            $link .= "<br>$instrString";
+        }
         $items[] = $link;
     }
     if(count($items) > 0) {
@@ -344,52 +385,6 @@ function staffenroll_getsubcourselist($subcrs = array(), $pid = 0) {
     return html_writer::div('no courses found');
 }
 
-/*
-function staffenroll_getsubcourseslist($subcrs = array(), $pid = 0) {
-    $items = array();
-    foreach($subcrs as $sc) {
-        $subitems = array();
-        $studenturl = new moodle_url(
-            '/blocks/staffenroll/enroll.php',
-            array(
-                'courseid' => $sc['id'],
-                'type' => 'student'
-            )
-        );
-        $studentlink = html_writer::link($studenturl, 'student');
-        $subitems[] = $studentlink;
-        $staffurl = new moodle_url(
-            '/blocks/staffenroll/enroll.php',
-            array(
-                'courseid' => $sc['id'],
-                'type' => 'staff'
-            )
-        );
-        $stafflink = html_writer::link($staffurl, 'staff');
-        $subitems[] = $stafflink;
-        $sublist = html_writer::alist($subitems);
-        $text = $sc['shortname'];
-        $fullname = trim($sc['fullname']);
-        if(count($fullname) > 0) {
-            $text = $fullname;
-        }
-        $summary = trim($sc['summary']);
-        $i = preg_match('/\w+/', $summary);
-        if($i == 1) {
-            $text .= ' (' . $summary . ')';
-        }
-        $item = implode(' ', array(
-            $text,
-            $sublist
-        ));
-        $items[] = $item;
-    }
-    if(count($items) > 0) {
-        return html_writer::alist($items);
-    }
-    return html_writer::div('no courses found');
-}
- */
 
 function staffenroll_getsubcourses($pid) {
     global $DB, $USER;
@@ -402,39 +397,40 @@ function staffenroll_getsubcourses($pid) {
     if($ok) {
         return $coursescategories->get($cachekey);
     }
-    else {
-        $records = $DB->get_records(
-            'course',
-            array('category' => $pid),
-            'sortorder',
-            'id, idnumber, shortname, fullname, summary, category'
+    $records = $DB->get_records(
+        'course',
+        array('category' => $pid),
+        'sortorder',
+        'id, idnumber, shortname, fullname, summary, category'
+    );
+    foreach($records as $r) {
+        $subcrs[] = array(
+            'id' => $r->id,
+            'idnumber' => $r->idnumber,
+            'shortname' => $r->shortname,
+            'fullname' => $r->fullname,
+            'summary' => $r->summary,
+            'category' => $r->category
         );
-        foreach($records as $r) {
-            $subcrs[] = array(
-                'id' => $r->id,
-                'idnumber' => $r->idnumber,
-                'shortname' => $r->shortname,
-                'fullname' => $r->fullname,
-                'summary' => $r->summary,
-                'category' => $r->category
-            );
-        }
     }
 
-    $enrollments = staffenroll_getuserenrollments($USER->id);
+    $enrollments = staffenroll_getuserstaffenrollments($USER->id);
     $courses = array();
     foreach($subcrs as $c) {
-        $ok = staffenroll_canenroll($c['id']);
-        if(! $ok or $c['id'] == 1) {
-            // homepage not course
+        $canenroll = staffenroll_canenroll($c['id']);
+        if($canenroll == 'none' or $c['id'] == 1) {
+            // homepage (id = 1) is not course
             continue;
         }
 
-        $roles = array();
         if(isset($enrollments[$c['id']])) {
-            $roles = $enrollments[$c['id']];
+            // FIXME: i don't think this is used anywhere
+            $c['roles'] = $enrollments[$c['id']];
         }
-        $c['roles'] = $roles;
+        $instrArray = staffenroll_getcourseinstructors($c['id']);
+        if(count($instrArray) > 0) {
+            $c['instructors'] = implode(', ', $instrArray);
+        }
         $courses[] = $c;
     }
     $now = time();
@@ -485,4 +481,34 @@ function staffenroll_getbreadcrumbs($categoryid = 0) {
         );
     }
     return $breadcrumbs;
+}
+
+
+
+/////////
+// ENROLL
+/////////
+
+
+// based on
+// https://stackoverflow.com/questions/594112/matching-an-ip-to-a-cidr-mask-in-php-5
+function staffenroll_validatenetworkhost() {
+    $hostip = $_SERVER['REMOTE_ADDR'];
+    $ip = ip2long($hostip);
+    $allowednetworks = get_config('block_staffenroll', 'allowednetworks');
+    $networks = explode("\n", $allowednetworks);
+    foreach($networks as $n) {
+        //list ($subnet, $bits) = explode('/', $range);
+        list ($subnet, $bits) = explode('/', $n);
+        if ($bits === null) {
+            $bits = 32;
+        }
+        $subnet = ip2long($subnet);
+        $mask = -1 << (32 - $bits);
+        $subnet &= $mask; # nb: in case the supplied subnet wasn't correctly aligned
+        if(($ip & $mask) == $subnet) {
+            return true;
+        }
+    }
+    return false;
 }

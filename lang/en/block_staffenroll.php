@@ -4,6 +4,7 @@ $string['staffenroll'] = 'Staff Enroll';
 $string['allcourseslink'] = 'All courses';
 $string['breadcrumblinktext'] = 'Staff enroll';
 $string['cachedef_coursescategories'] = 'Cached courses and categories data';
+$string['course'] = 'course';
 // SETTINGS
 $string['staffenroll:studentenroll'] = 'Allows for student to be temporarily enrolled';
 $string['staffenroll:staffenroll'] = 'Allows for staff to be temporarily enrolled';
@@ -27,5 +28,7 @@ $string['allowednetworkslabel'] = 'Allowed network[s]';
 $string['allowednetworksdesc'] = 'Enter network/CIDR combination[s] to limit access (default allows all)';
 $string['prohibitedcategorieslabel'] = 'Prohibited Categories';
 $string['prohibitedcategoriesdesc'] = 'Select categories where staffenroll functionality will NOT be available';
+$string['instructorroleslabel'] = 'Instructor Roles';
+$string['instructorrolesdesc'] = 'Select all instructor roles (to display instructors with courses)';
 $string['cacheexpirationlabel'] = 'Cached data expiration';
 $string['cacheexpirationdesc'] = 'Duration cached data remains valid (default 90 days)';
