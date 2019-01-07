@@ -30,15 +30,50 @@ foreach ($breadcrumbs as $bc) {
     $PAGE->navbar->add($bc['name'], $bc['href']);
 }
 
+// CHECKS
+
+$errors = array();
+// validate IP addr
 $ok = staffenroll_validatenetworkhost();
 if(! $ok) {
     // FIXME: abort processing on this error
-    error_log('!!! invalid ip: ' . $_SERVER['REMOTE_ADDR']);
+    $errors[] = 'invalid ip: ' . $_SERVER['REMOTE_ADDR'];
 }
+
+
+// avoid duplicate enrollment
+$enrollments = array();
+if(isset($_SESSION['block_staffenroll']['userstaffenrollments'])) {
+    $enrollments = $_SESSION['block_staffenroll']['userstaffenrollments'];
+}
+else {
+    $enrollments = staffenroll_getuserstaffenrollments();
+}
+foreach($enrollments as $e) {
+    if($e['id'] == $courseid) {
+        $errors[] = 'already enrolled in courseid: ' . $courseid;
+        break;
+    }
+}
+
+// able to enroll as staff/student
+$ccIdx = 'canenrollcourse' . $courseid;
+$canenroll = NULL;
+if(isset($_SESSION['block_staffenroll'][$ccIdx])) {
+    $canenroll = $_SESSION['block_staffenroll'][$ccIdx];
+}
+else {
+    $canenroll = staffenroll_canenroll($courseid);
+    $_SESSION['block_staffenroll'][$ccIdx] = $canenroll;
+}
+// course enroll
+// redirect to course
+
+$enroll = new enroll_form();
 
 // print the header
 echo $OUTPUT->header();
-echo html_writer::div('courseid: ' . $courseid);
+$enroll->display();
 echo $OUTPUT->footer();
 
 // this is enrol/unenroll code taken from previous version of plugin

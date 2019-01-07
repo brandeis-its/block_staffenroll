@@ -386,7 +386,7 @@ function staffenroll_getsubcourselist($subcrs = array(), $pid = 0) {
 
 
 function staffenroll_getsubcourses($pid) {
-    global $DB, $USER;
+    global $DB, $USER, $_SESSION;
 
     $coursescategories = cache::make('block_staffenroll', 'coursescategories');
     $cachekey = 'pcrs' . $pid;
@@ -413,17 +413,42 @@ function staffenroll_getsubcourses($pid) {
         );
     }
 
-    $enrollments = staffenroll_getuserstaffenrollments($USER->id);
+    // sticking existing userstaffenrollments into session
+    $enrollments = array();;
+    if(isset($_SESSION['block_staffenroll'])) {
+        if(isset($_SESSION['block_staffenroll']['userstaffenrollments'])) {
+            $enrollments = $_SESSION['block_staffenroll']['userstaffenrollments'];
+        }
+        else {
+            $enrollments = staffenroll_getuserstaffenrollments($USER->id);
+            $_SESSION['block_staffenroll']['userstaffenrollments'] = $enrollments;
+        }
+    }
+    else {
+        $_SESSION['block_staffenroll'] = array();
+        $enrollments = staffenroll_getuserstaffenrollments($USER->id);
+        $_SESSION['block_staffenroll']['userstaffenrollments'] = $enrollments;
+    }
+
     $courses = array();
     foreach($subcrs as $c) {
-        $canenroll = staffenroll_canenroll($c['id']);
+        // cache value in session for enrollment checks
+        $canenroll = NULL;
+        $ccIdx = 'canenrollcourse' . $c['id'];
+        if(isset($_SESSION['block_staffenroll'][$ccIdx])) {
+            $canenroll = $_SESSION['block_staffenroll'][$ccIdx];
+        }
+        else {
+            $canenroll = staffenroll_canenroll($c['id']);
+            $_SESSION['block_staffenroll'][$ccIdx] = $canenroll;
+        }
         if($canenroll == 'none' or $c['id'] == 1) {
             // homepage (id = 1) is not course
             continue;
         }
 
+        // FIXME: i don't think this key is used anywhere
         if(isset($enrollments[$c['id']])) {
-            // FIXME: i don't think this is used anywhere
             $c['roles'] = $enrollments[$c['id']];
         }
         $instrArray = staffenroll_getcourseinstructors($c['id']);

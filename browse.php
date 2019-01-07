@@ -5,7 +5,7 @@ require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
 $site = get_site();
 $parentid = optional_param('parentid', 0, PARAM_INT);
-$PAGE->set_cacheable(false);
+// $PAGE->set_cacheable(false);
 
 if($parentid) {
     $pageurl = new moodle_url(

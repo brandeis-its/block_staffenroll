@@ -32,3 +32,5 @@ $string['instructorroleslabel'] = 'Instructor Roles';
 $string['instructorrolesdesc'] = 'Select all instructor roles (to display instructors with courses)';
 $string['cacheexpirationlabel'] = 'Cached data expiration';
 $string['cacheexpirationdesc'] = 'Duration cached data remains valid (default 90 days)';
+// ENROLL
+$string['enrollheader'] = 'Enroll validation';
