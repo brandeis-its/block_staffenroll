@@ -3,6 +3,8 @@
 require_once('../../config.php');
 require_once($CFG->dirroot . '/blocks/staffenroll/lib.php');
 
+global $DB;
+
 $site = get_site();
 
 $courseid = required_param('courseid', PARAM_INT);
@@ -36,8 +38,11 @@ $errors = array();
 // validate IP addr
 $ok = staffenroll_validatenetworkhost();
 if(! $ok) {
-    // FIXME: abort processing on this error
-    $errors[] = 'invalid ip: ' . $_SERVER['REMOTE_ADDR'];
+    $msg = implode(': ', array(
+        get_string('invalidip', 'block_staffenroll'),
+        $_SERVER['REMOTE_ADDR']
+    ));
+    $errors[] = $msg;
 }
 
 
@@ -51,7 +56,11 @@ else {
 }
 foreach($enrollments as $e) {
     if($e['id'] == $courseid) {
-        $errors[] = 'already enrolled in courseid: ' . $courseid;
+        $msg = implode(': ', array(
+            get_string('alreadyenrolled', 'block_staffenroll'),
+            $courseid
+        ));
+        $errors[] = $msg;
         break;
     }
 }
@@ -66,68 +75,39 @@ else {
     $canenroll = staffenroll_canenroll($courseid);
     $_SESSION['block_staffenroll'][$ccIdx] = $canenroll;
 }
+
+if($canenroll == 'none') {
+    $msg = implode(' ', array(
+        $USER->username,
+        get_string('insufficientpermissions', 'block_staffenroll')
+    ));
+    $errors[] = $msg;
+}
+
+// course exists
+$course = $DB->get_record('course', array('id' => $courseid));
+if (!$course) {
+    $msg = implode(' ', array(
+        get_string('missingcourse', 'block_staffenroll'),
+        $courseid
+    ));
+    $errors[] = $msg;
+}
+
+// return errors
+if(count($errors) > 0) {
+    $enroll = new enroll_form($errors);
+    echo $OUTPUT->header();
+    $enroll->display();
+    echo $OUTPUT->footer();
+}
+
 // course enroll
-// redirect to course
-
-$enroll = new enroll_form();
-
-// print the header
-echo $OUTPUT->header();
-$enroll->display();
-echo $OUTPUT->footer();
-
-// this is enrol/unenroll code taken from previous version of plugin
-// this file should contain actual enroll/unenroll code
-// FIXME: needs review throughout
-
-/*
- * FIXME: handle unenrol somewhere else
-
-// this handles if they are unenrolling
-// unenroll them then redirect to the main page
-$action = isset($_REQUEST['enrl_action']) ? $_REQUEST['enrl_action'] : NULL;
-if (isset($action) && $action == 'unenroll') {
-    $course = $DB->get_record('course', array('id' => $courseid));
-    if (!$course) {
-        print_error('cannot_retrieve_course', 'local_support_staff_enroll');
-    }
-
-    support_staff_enroll_enroll_user($USER, $course, '', 'unenroll');
-
-    redirect($CFG->wwwroot);
-}
- */
-
-/*
- * FIXME: this might be better handled in another file
-
- // if they chose to enroll, enroll them then redirect to course
-if (isset($_REQUEST['enroll'])) {
-    $type = $_REQUEST['enrl_type'];
-
-    if (!isset($courseid) || !isset($type)) {
-        print_error('must_supply_crs_and_enrl_type',
-                     'local_support_staff_enroll');
-    }
-
-    $enrollments = support_staff_enroll_get_enrollments($USER->id);
-    if (isset($enrollments[$courseid])) {
-        print_error('already_enrolled', 'local_support_staff_enroll');
-    }
-
-    $allowed = support_staff_enroll_can_enroll_as($type, $env);
-    if (!$allowed) {
-        print_error('no_permission_enroll', 'local_support_staff_enroll');
-    }
-
-    $course = $DB->get_record('course', array('id' => $courseid));
-    if (!$course) {
-        print_error('cannot_retrieve_course', 'local_support_staff_enroll');
-    }
-
-    support_staff_enroll_enroll_user($USER, $course, $type);
-
-    redirect($CFG->wwwroot.'/course/view.php?id='.$course->id);
-}
- */
+$errors = staffenroll_enroll($courseid, $canenroll);
+$courseUrl = implode('', array(
+    $CFG->wwwroot,
+    '/couse/view.php?id=',
+    $courseid
+));
+redirect($couseUrl);
 

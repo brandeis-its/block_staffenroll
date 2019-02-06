@@ -542,3 +542,73 @@ function staffenroll_validatenetworkhost() {
     }
     return false;
 }
+
+
+function staffenroll_enroll($cid, $typ, $action='enroll') {
+    global $DB, $USER;
+
+    $err = [];
+    if ($action != 'enroll' && $action != 'unenroll') {
+        $msg = implode(' ', array(
+            get_string('invalidaction', 'block_staffenroll'),
+            $action
+        ));
+        $err[] = $msg;
+        return $err;
+    }
+
+    $roleid = 0;
+    if ($typ == 'student') {
+        $roleid = get_config('block_staffenroll', 'studentrole');
+    } elseif ($typ == 'staff') {
+        $roleid = get_config('block_staffenroll', 'staffrole');
+    } else {
+        $msg = implode(' ', array(
+            get_string('invalidtyp', 'block_staffenroll'),
+            $typ
+        ));
+        $err[] = $msg;
+        return $err;
+    }
+
+    $context = context_course::instance($cid);
+    if (! $context) {
+        $msg = implode(' ', array(
+            get_string('invalidcontext', 'block_staffenroll'),
+            $cid
+        ));
+        $err[] = $msg;
+        return $err;
+    }
+    // this does the actual enrolling
+    $manual = enrol_get_plugin('manual');
+    $instances = $DB->get_records(
+        'enrol',
+        array(
+            'enrol' => 'manual',
+            'courseid' => $cid,
+            'status' => ENROL_INSTANCE_ENABLED
+        ),
+        'sortorder,id ASC'
+    );
+
+    $instance = reset($instances);
+    $event = False;
+    $ctx = array('context' => $context);
+    if ($action == 'enroll') {
+        // adding time so that these can be expired when over 24 hours long
+        $epoch = time();
+        $manual->enrol_user( $instance, $USER->id, $roleid, $epoch);
+        // FIXME: wtf is this?
+        $event = \local_support_staff_enroll\event\role_assigned::create($ctx);
+    } elseif ($action == 'unenroll') {
+        $manual->unenrol_user( $instance, $user->id );
+        $event = \local_support_staff_enroll\event\role_unassigned::create($ctx);
+    } else {
+        print_error('unknown_action', 'local_support_staff_enroll');
+    }
+
+    $event->trigger();
+
+    return $err;
+}

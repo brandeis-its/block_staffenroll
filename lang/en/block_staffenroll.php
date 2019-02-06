@@ -34,3 +34,10 @@ $string['cacheexpirationlabel'] = 'Cached data expiration';
 $string['cacheexpirationdesc'] = 'Duration cached data remains valid (default 90 days)';
 // ENROLL
 $string['enrollheader'] = 'Enroll validation';
+$string['invalidip'] = 'invalid ip address';
+$string['alreadyenrolled'] = 'already enrolled in courseid';
+$string['insufficientpermissions'] = 'does not have sufficient permissions to enroll';
+$string['missingcourse'] = 'No course found for courseid:';
+$string['invalidaction'] = 'Invalid action:';
+$string['invalidtyp'] = 'Invalid account type:';
+$string['invalidcontext'] = 'Could not get context for course id:';
