@@ -41,4 +41,4 @@ $string['missingcourse'] = 'No course found for courseid:';
 $string['invalidaction'] = 'Invalid action:';
 $string['invalidtyp'] = 'Invalid account type:';
 $string['invalidcontext'] = 'Could not get context for course id:';
-$string['invalidinstance'] = 'Could not get manual enrol instance for course id:';
+$string['invalidenrol'] = 'Could enrol record for course id:';

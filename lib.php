@@ -581,19 +581,20 @@ function staffenroll_enroll($cid, $typ, $action='enroll') {
         return $err;
     }
     // this does the actual enrolling
-    $manual = enrol_get_plugin('manual');
-    $instances = $DB->get_records(
+    $manplugin = enrol_get_plugin('manual');
+    $enrol = $DB->get_record(
         'enrol',
         array(
-            'enrol' => 'manual',
             'courseid' => $cid,
+            'enrol' => 'manual',
             'status' => ENROL_INSTANCE_ENABLED
         ),
-        'sortorder,id ASC'
+        '*',
+        MUST_EXIST
     );
-    if(! $instances or count($instances) < 1) {
+    if (! $enrol) {
         $msg = implode(' ', array(
-            get_string('invalidinstance', 'block_staffenroll'),
+            get_string('invalidenrol', 'block_staffenroll'),
             $cid
         ));
         $err[] = $msg;
@@ -602,11 +603,11 @@ function staffenroll_enroll($cid, $typ, $action='enroll') {
 
     if ($action == 'enroll') {
         // adding time so that these can be expired when over 24 hours long
-        $manual->enrol_user($instances[0], $USER->id, $roleid, time());
+        $manplugin->enrol_user($enrol, $USER->id, $roleid, time());
         // FIXME: logging should happen automatcially
         //$event = \core\event\user_enrolment_created::create($ctx);
     } elseif ($action == 'unenroll') {
-        $manual->unenrol_user($instances[0], $user->id );
+        $manplugin->unenrol_user($enrol, $USER->id );
     }
 
     return $err;
