@@ -94,16 +94,18 @@ if (!$course) {
     $errors[] = $msg;
 }
 
-// return errors
+// try enrolling
+if(count($errors) < 1) {
+    $errors = staffenroll_enroll($courseid, $canenroll);
+}
+
 if(count($errors) > 0) {
-    $enroll = new enroll_form($errors);
+    $errorHTML = staffenroll_generateerrorlist($errors);
     echo $OUTPUT->header();
-    $enroll->display();
+    echo html_writer::alist($errors);
     echo $OUTPUT->footer();
 }
 
-// course enroll
-$errors = staffenroll_enroll($courseid, $canenroll);
 $courseUrl = implode('', array(
     $CFG->wwwroot,
     '/couse/view.php?id=',

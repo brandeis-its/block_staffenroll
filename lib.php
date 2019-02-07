@@ -591,24 +591,23 @@ function staffenroll_enroll($cid, $typ, $action='enroll') {
         ),
         'sortorder,id ASC'
     );
-
-    $instance = reset($instances);
-    $event = False;
-    $ctx = array('context' => $context);
-    if ($action == 'enroll') {
-        // adding time so that these can be expired when over 24 hours long
-        $epoch = time();
-        $manual->enrol_user( $instance, $USER->id, $roleid, $epoch);
-        // FIXME: wtf is this?
-        $event = \local_support_staff_enroll\event\role_assigned::create($ctx);
-    } elseif ($action == 'unenroll') {
-        $manual->unenrol_user( $instance, $user->id );
-        $event = \local_support_staff_enroll\event\role_unassigned::create($ctx);
-    } else {
-        print_error('unknown_action', 'local_support_staff_enroll');
+    if(! $instances or count($instances) < 1) {
+        $msg = implode(' ', array(
+            get_string('invalidinstance', 'block_staffenroll'),
+            $cid
+        ));
+        $err[] = $msg;
+        return $err;
     }
 
-    $event->trigger();
+    if ($action == 'enroll') {
+        // adding time so that these can be expired when over 24 hours long
+        $manual->enrol_user($instances[0], $USER->id, $roleid, time());
+        // FIXME: logging should happen automatcially
+        //$event = \core\event\user_enrolment_created::create($ctx);
+    } elseif ($action == 'unenroll') {
+        $manual->unenrol_user($instances[0], $user->id );
+    }
 
     return $err;
 }
