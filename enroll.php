@@ -111,5 +111,5 @@ $courseUrl = implode('', array(
     '/couse/view.php?id=',
     $courseid
 ));
-redirect($couseUrl);
+redirect($courseUrl);
 
